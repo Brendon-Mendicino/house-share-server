@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="HouseShareServerApplication" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" nameIsGenerated="true">
+        <additionalParameters>
+            <param>
+                <option name="enabled" value="true"/>
+                <option name="name" value="management.endpoint.env.show-values"/>
+                <option name="value" value="when_authorized"/>
+            </param>
+        </additionalParameters>
+        <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
+        <module name="house-share-server.main"/>
+        <option name="SPRING_BOOT_MAIN_CLASS"
+                value="com.github.brendonmendicino.houseshareserver.HouseShareServerApplication"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

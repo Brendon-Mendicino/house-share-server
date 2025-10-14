@@ -1,0 +1,28 @@
+package com.github.brendonmendicino.houseshareserver.controller
+
+import com.github.brendonmendicino.houseshareserver.dto.GroupDto
+import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
+import com.github.brendonmendicino.houseshareserver.service.GroupService
+import jakarta.validation.Valid
+import org.springframework.data.domain.Pageable
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping("/api/v1/groups")
+class GroupController(
+    private val groupService: GroupService,
+) : CrudController<GroupDto>(groupService) {
+    @PutMapping("/{groupId}/users/{userId}")
+    fun addUser(@PathVariable groupId: Long, @PathVariable userId: Long) = groupService.addUser(groupId, userId)
+
+    @DeleteMapping("/{groupId}/users/{userId}")
+    fun deleteUser(@PathVariable groupId: Long, @PathVariable userId: Long) = groupService.removeUser(groupId, userId)
+
+    @PostMapping("/{groupId}/shopping-items")
+    fun addShoppingItem(@PathVariable groupId: Long, @Valid @RequestBody item: ShoppingItemDto) =
+        groupService.addShoppingItem(groupId, item)
+
+    @GetMapping("/{groupId}/shopping-items")
+    fun getShoppingItems(@PathVariable groupId: Long, pageable: Pageable) =
+        groupService.getShoppingItems(groupId, pageable)
+}

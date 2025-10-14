@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: house-share-server
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+springdoc:
+  swagger-ui:
+    path: "/swagger-ui.html"

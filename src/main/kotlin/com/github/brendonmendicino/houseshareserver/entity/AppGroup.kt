@@ -1,50 +1,50 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
+import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
-import org.hibernate.annotations.CreationTimestamp
-import java.time.OffsetDateTime
 
 @Entity
 class AppGroup(
     var name: String,
     var description: String?,
 ) : BaseEntity() {
-    @CreationTimestamp
-    lateinit var createdAt: OffsetDateTime
+    @Embedded
+    lateinit var audit: Auditable
 
     @ManyToMany
-    var users: MutableMap<Long, AppUser> = mutableMapOf()
+    var users: MutableSet<AppUser> = mutableSetOf()
 
     @OneToMany(mappedBy = "appGroup")
-    var shoppingItems: MutableMap<Long, ShoppingItem> = mutableMapOf()
+    var shoppingItems: MutableSet<ShoppingItem> = mutableSetOf()
 
     @OneToMany(mappedBy = "group")
-    var expenses: MutableMap<Long, Expense> = mutableMapOf()
+    var expenses: MutableSet<Expense> = mutableSetOf()
 
 
     fun addUser(user: AppUser) {
-        users[user.id] = user
-        user.groups[id] = this
+        users.add(user)
+        user.groups.add(this)
     }
 
     fun removeUser(userId: Long) {
-        val user = users.remove(userId)
-        user?.groups?.remove(id)
+        val user = users.find { it.id == userId }
+        users.remove(user)
+        user?.groups?.remove(this)
     }
 
     fun addShoppingItem(shoppingItem: ShoppingItem) {
-        shoppingItems[shoppingItem.id] = shoppingItem
+        shoppingItems.add(shoppingItem)
         shoppingItem.appGroup = this
     }
 
     fun removeShoppingItem(shoppingItemId: Long) {
-        shoppingItems.remove(shoppingItemId)
+        shoppingItems.removeIf { it.id == shoppingItemId }
     }
 
     fun addExpense(expense: Expense) {
-        expenses[expense.id] = expense
+        expenses.add(expense)
         expense.group = this
     }
 }

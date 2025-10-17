@@ -10,6 +10,6 @@ class GroupEntityMapper : Mapper<AppGroup, GroupDto> {
         id = it.id,
         name = it.name,
         description = it.description,
-        userIds = it.users.keys.toList(),
+        userIds = it.users.map { it.id },
     )
 }

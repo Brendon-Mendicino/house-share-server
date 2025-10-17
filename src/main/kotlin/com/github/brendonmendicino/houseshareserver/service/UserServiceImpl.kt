@@ -1,6 +1,8 @@
 package com.github.brendonmendicino.houseshareserver.service
 
+import com.github.brendonmendicino.houseshareserver.dto.GroupDto
 import com.github.brendonmendicino.houseshareserver.dto.UserDto
+import com.github.brendonmendicino.houseshareserver.entity.AppGroup
 import com.github.brendonmendicino.houseshareserver.entity.AppUser
 import com.github.brendonmendicino.houseshareserver.exception.UserException
 import com.github.brendonmendicino.houseshareserver.mapper.Mapper
@@ -17,10 +19,11 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val dtoMapper: Mapper<UserDto, AppUser>,
     private val entityMapper: Mapper<AppUser, UserDto>,
+    private val groupMapper: Mapper<AppGroup, GroupDto>,
 ) : UserService {
 
     override fun getAll(pageable: Pageable): Page<UserDto> =
-        userRepository.also { println(pageable) }.findAll(pageable).map { entityMapper.map(it) }
+        userRepository.findAll(pageable).map { entityMapper.map(it) }
 
     override fun getById(id: Long): UserDto =
         userRepository.findByIdOrNull(id)?.let { entityMapper.map(it) } ?: throw UserException.NotFound.from(id)
@@ -40,4 +43,8 @@ class UserServiceImpl(
         userRepository.deleteById(id)
     }
 
+    override fun findGroups(userId: Long): List<GroupDto> {
+        val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
+        return user.groups.map { groupMapper.map(it) }
+    }
 }

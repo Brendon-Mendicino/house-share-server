@@ -2,6 +2,8 @@ package com.github.brendonmendicino.houseshareserver.controller
 
 import com.github.brendonmendicino.houseshareserver.dto.UserDto
 import com.github.brendonmendicino.houseshareserver.service.UserService
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -10,4 +12,6 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService,
 ) : CrudController<UserDto>(userService) {
+    @GetMapping("/{userId}/groups")
+    fun findGroup(@PathVariable userId: Long) = userService.findGroups(userId)
 }

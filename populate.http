@@ -1,0 +1,172 @@
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "id": 0,
+  "username": "brendon"
+}
+
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "id": 0,
+  "username": "flavy"
+}
+
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "id": 0,
+  "username": "salvo"
+}
+
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "id": 0,
+  "username": "ciullo"
+}
+
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "id": 0,
+  "username": "andre"
+}
+
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "id": 0,
+  "username": "peppe"
+}
+
+###
+
+POST http://localhost:8080/api/v1/groups
+Content-Type: application/json
+
+{
+  "id": 0,
+  "description": "1",
+  "name": "belli",
+  "userIds": [
+    1,
+    2,
+    3,
+    4
+  ]
+}
+
+###
+
+POST http://localhost:8080/api/v1/groups
+Content-Type: application/json
+
+{
+  "id": 0,
+  "description": "2",
+  "name": "brutti",
+  "userIds": [
+    1,
+    4,
+    5,
+    6
+  ]
+}
+
+###
+
+POST http://localhost:8080/api/v1/groups
+Content-Type: application/json
+
+{
+  "id": 0,
+  "description": "3",
+  "name": "cicci",
+  "userIds": [
+    1,
+    2,
+    6
+  ]
+}
+
+###
+
+POST http://localhost:8080/api/v1/groups/1/shopping-items
+Content-Type: application/json
+
+{
+  "id": 0,
+  "name": "pane",
+  "amount": 1,
+  "createdAt": "2011-10-05T14:48:00.000Z",
+  "groupId": 1,
+  "ownerId": 1,
+  "priority": "Later"
+}
+
+###
+
+POST http://localhost:8080/api/v1/groups/1/shopping-items
+Content-Type: application/json
+
+{
+  "id": 0,
+  "name": "pizza",
+  "amount": 10,
+  "createdAt": "2011-10-05T14:48:00.000Z",
+  "groupId": 1,
+  "ownerId": 1,
+  "priority": "Now"
+}
+
+###
+
+POST http://localhost:8080/api/v1/groups/1/shopping-items
+Content-Type: application/json
+
+{
+  "id": 0,
+  "name": "patate",
+  "amount": 5,
+  "createdAt": "2011-10-05T14:48:00.000Z",
+  "groupId": 1,
+  "ownerId": 2,
+  "priority": "Later",
+  "price": 40.0,
+  "check": {
+    "checkingUserId": 3,
+    "checkoffTimestamp": "2011-10-05T14:48:00.000Z"
+  }
+}
+
+###
+
+POST http://localhost:8080/api/v1/groups/1/shopping-items
+Content-Type: application/json
+
+{
+  "id": 0,
+  "name": "patate",
+  "amount": 1,
+  "createdAt": "2011-10-05T14:48:00.000Z",
+  "groupId": 1,
+  "ownerId": 1,
+  "priority": "Later",
+  "check": {
+    "checkingUserId": 1,
+    "checkoffTimestamp": "2011-10-05T14:48:00.000Z"
+  }
+}

@@ -15,29 +15,32 @@ class AppUser(
     lateinit var createdAt: OffsetDateTime
 
     @ManyToMany(mappedBy = "users", cascade = [CascadeType.MERGE])
-    lateinit var groups: MutableMap<Long, AppGroup>
+    var groups: MutableSet<AppGroup> = mutableSetOf()
 
     @OneToMany(mappedBy = "owner", cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-    lateinit var shoppingItems: MutableMap<Long, ShoppingItem>
+    var shoppingItems: MutableSet<ShoppingItem> = mutableSetOf()
+
+    @OneToMany(mappedBy = "checkingUser")
+    var checkedShoppingItems: MutableSet<ShoppingItem> = mutableSetOf()
 
     @OneToMany(mappedBy = "owner", cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-    lateinit var ownedExpenses: MutableMap<Long, Expense>
+    var ownedExpenses: MutableSet<Expense> = mutableSetOf()
 
     @OneToMany(mappedBy = "payer", cascade = [CascadeType.MERGE])
-    lateinit var payedExpenses: MutableMap<Long, Expense>
+    var payedExpenses: MutableSet<Expense> = mutableSetOf()
 
     fun addShoppingItem(item: ShoppingItem) {
-        shoppingItems[item.id] = item
+        shoppingItems.add(item)
         item.owner = this
     }
 
     fun addOwnedExpense(expense: Expense) {
-        ownedExpenses[expense.id] = expense
+        ownedExpenses.add(expense)
         expense.owner = this
     }
 
     fun addPayedExpense(expense: Expense) {
-        payedExpenses[expense.id] = expense
+        payedExpenses.add(expense)
         expense.payer = this
     }
 }

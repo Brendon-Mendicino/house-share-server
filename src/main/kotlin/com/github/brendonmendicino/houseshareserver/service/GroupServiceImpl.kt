@@ -52,7 +52,8 @@ class GroupServiceImpl(
      */
     private fun createShoppingItem(groupId: Long, itemDto: ShoppingItemDto): ShoppingItem {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
-        val owner = group.users[itemDto.ownerId] ?: throw UserException.NotFound.from(itemDto.ownerId)
+        val owner =
+            groupRepository.findUserById(groupId, itemDto.ownerId) ?: throw UserException.NotFound.from(itemDto.ownerId)
 
         val item = ShoppingItem(
             owner = owner,
@@ -61,6 +62,9 @@ class GroupServiceImpl(
             amount = itemDto.amount,
             price = itemDto.price,
             priority = itemDto.priority,
+            // TODO: decide if I want to keep the data from the dto (probably yes?)
+            checkingUser = null,
+            checkoffTimestamp = null,
         )
 
         group.addShoppingItem(item)
@@ -74,8 +78,12 @@ class GroupServiceImpl(
      */
     private fun createExpense(groupId: Long, expenseDto: ExpenseDto): Expense {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
-        val owner = group.users[expenseDto.ownerId] ?: throw UserException.NotFound.from(expenseDto.ownerId)
-        val payer = group.users[expenseDto.payerId] ?: throw UserException.NotFound.from(expenseDto.payerId)
+        val owner = groupRepository.findUserById(groupId, expenseDto.ownerId) ?: throw UserException.NotFound.from(
+            expenseDto.ownerId
+        )
+        val payer = groupRepository.findUserById(groupId, expenseDto.payerId) ?: throw UserException.NotFound.from(
+            expenseDto.payerId
+        )
 
         val expense = Expense(
             owner = owner,

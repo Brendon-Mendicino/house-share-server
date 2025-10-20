@@ -1,0 +1,33 @@
+{
+  "realm": "house-share",
+  "users": [
+    {
+      "id": "81dd70cc-15e5-4bdc-9ed8-d83bf4b183d8",
+      "username": "bre",
+      "firstName": "Brendon",
+      "lastName": "Mendicino",
+      "email": "bre@bre.com",
+      "emailVerified": false,
+      "createdTimestamp": 1760868954685,
+      "enabled": true,
+      "totp": false,
+      "credentials": [
+        {
+          "id": "30064c98-c20b-49c5-9b80-722c94849757",
+          "type": "password",
+          "userLabel": "My password",
+          "createdDate": 1760868977602,
+          "secretData": "{\"value\":\"Oc4TYpHiWGS2lgefmmKCmtC0MNGM/TLZn12y/Ho59Ko5o+mdS3R2JJ2/cs0hT60T9S3uU/4XK/2miEX8AUBJqA==\",\"salt\":\"0SiT5UlXUoNTQcbKoTnCyw==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-house-share"
+      ],
+      "notBefore": 0,
+      "groups": []
+    }
+  ]
+}

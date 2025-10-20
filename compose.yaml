@@ -1,4 +1,23 @@
 services:
+  keycloak:
+    image: keycloak/keycloak:24.0
+    hostname: keycloak
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+    volumes:
+      - ./docker/keycloak/realm:/opt/keycloak/data/import
+    command: start-dev --import-realm
+
+  # Used to access hostnames from the host machine
+  docker-hoster:
+    image: dvdarias/docker-hoster:latest
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
+
   postgres:
     image: 'postgres:18.0'
     environment:

@@ -6,6 +6,37 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://keycloak:8080/realms/house-share
+        registration:
+          house-share-server:
+            provider: keycloak
+            client-id: house-share-server
+            client-secret: TfvbQdtekYanX686RgkbUhzToCefcS6Y
+            scope:
+              - openid
+              - offline_access
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:9090/login/oauth2/code/house-share-server
+
+          house-share-app:
+            provider: keycloak
+            client-id: house-share-app
+            client-secret: LeLeiJX2qUrdGB3DapC05zpInFEMndBR
+            scope:
+              - openid
+              - offline_access
+            authorization-grant-type: authorization_code
+            redirect-uri: app://lol.terabrendon.houseshare2
+
+
 springdoc:
   swagger-ui:
     path: "/swagger-ui.html"
+
+server:
+  port: 9090

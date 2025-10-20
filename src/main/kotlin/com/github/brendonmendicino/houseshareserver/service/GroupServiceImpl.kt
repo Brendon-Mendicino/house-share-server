@@ -8,7 +8,7 @@ import com.github.brendonmendicino.houseshareserver.entity.Expense
 import com.github.brendonmendicino.houseshareserver.entity.ShoppingItem
 import com.github.brendonmendicino.houseshareserver.exception.GroupException
 import com.github.brendonmendicino.houseshareserver.exception.UserException
-import com.github.brendonmendicino.houseshareserver.mapper.Mapper
+import com.github.brendonmendicino.houseshareserver.mapper.toDto
 import com.github.brendonmendicino.houseshareserver.repository.ExpenseRepository
 import com.github.brendonmendicino.houseshareserver.repository.GroupRepository
 import com.github.brendonmendicino.houseshareserver.repository.ShoppingItemRepository
@@ -26,9 +26,6 @@ class GroupServiceImpl(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val expenseRepository: ExpenseRepository,
     private val userRepository: UserRepository,
-    private val shoppingItemMapper: Mapper<ShoppingItem, ShoppingItemDto>,
-    private val entityMapper: Mapper<AppGroup, GroupDto>,
-    private val expenseMapper: Mapper<Expense, ExpenseDto>,
 ) : GroupService {
     /**
      * Creates a [AppGroup] with its users.
@@ -103,12 +100,12 @@ class GroupServiceImpl(
     }
 
     override fun getAll(pageable: Pageable): Page<GroupDto> =
-        groupRepository.findAll(pageable).map { entityMapper.map(it) }
+        groupRepository.findAll(pageable).map { it.toDto() }
 
     override fun getById(id: Long): GroupDto =
-        groupRepository.findByIdOrNull(id)?.let { entityMapper.map(it) } ?: throw GroupException.NotFound.from(id)
+        groupRepository.findByIdOrNull(id)?.toDto() ?: throw GroupException.NotFound.from(id)
 
-    override fun save(dto: GroupDto): GroupDto = groupRepository.save(createGroup(dto)).let { entityMapper.map(it) }
+    override fun save(dto: GroupDto): GroupDto = groupRepository.save(createGroup(dto)).toDto()
 
     override fun update(
         id: Long,
@@ -118,7 +115,7 @@ class GroupServiceImpl(
         // Create new entity if it does not exist
         group.id = if (groupRepository.existsById(id)) id else 0
 
-        return groupRepository.save(group).let { entityMapper.map(it) }
+        return groupRepository.save(group).toDto()
     }
 
     override fun delete(id: Long) {
@@ -134,7 +131,7 @@ class GroupServiceImpl(
 
         group.addUser(user)
 
-        return groupRepository.save(group).let { entityMapper.map(it) }
+        return groupRepository.save(group).toDto()
     }
 
     override fun removeUser(groupId: Long, userId: Long): GroupDto {
@@ -142,22 +139,23 @@ class GroupServiceImpl(
 
         group.removeUser(userId)
 
-        return groupRepository.save(group).let { entityMapper.map(it) }
+        return groupRepository.save(group).toDto()
     }
 
     override fun addShoppingItem(groupId: Long, item: ShoppingItemDto): ShoppingItemDto =
-        shoppingItemRepository.save(createShoppingItem(groupId, item)).let { shoppingItemMapper.map(it) }
+        shoppingItemRepository.save(createShoppingItem(groupId, item)).toDto()
 
-    override fun getShoppingItems(groupId: Long, pageable: Pageable): Page<ShoppingItemDto> = shoppingItemRepository
-        .findAllByGroupId(groupId, pageable).map { shoppingItemMapper.map(it) }
+    override fun getShoppingItems(groupId: Long, pageable: Pageable): Page<ShoppingItemDto> =
+        shoppingItemRepository
+            .findAllByGroupId(groupId, pageable).map { it.toDto() }
 
     override fun addExpense(
         groupId: Long,
         expense: ExpenseDto
-    ): ExpenseDto = expenseRepository.save(createExpense(groupId, expense)).let { expenseMapper.map(it) }
+    ): ExpenseDto = expenseRepository.save(createExpense(groupId, expense)).toDto()
 
     override fun getExpenses(
         groupId: Long,
         pageable: Pageable
-    ): Page<ExpenseDto> = expenseRepository.findAllByGroupId(groupId, pageable).map { expenseMapper.map(it) }
+    ): Page<ExpenseDto> = expenseRepository.findAllByGroupId(groupId, pageable).map { it.toDto() }
 }

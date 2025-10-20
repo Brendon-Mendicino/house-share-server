@@ -2,10 +2,9 @@ package com.github.brendonmendicino.houseshareserver.service
 
 import com.github.brendonmendicino.houseshareserver.dto.GroupDto
 import com.github.brendonmendicino.houseshareserver.dto.UserDto
-import com.github.brendonmendicino.houseshareserver.entity.AppGroup
-import com.github.brendonmendicino.houseshareserver.entity.AppUser
 import com.github.brendonmendicino.houseshareserver.exception.UserException
-import com.github.brendonmendicino.houseshareserver.mapper.Mapper
+import com.github.brendonmendicino.houseshareserver.mapper.toDto
+import com.github.brendonmendicino.houseshareserver.mapper.toEntity
 import com.github.brendonmendicino.houseshareserver.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -17,26 +16,23 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val dtoMapper: Mapper<UserDto, AppUser>,
-    private val entityMapper: Mapper<AppUser, UserDto>,
-    private val groupMapper: Mapper<AppGroup, GroupDto>,
 ) : UserService {
 
     override fun getAll(pageable: Pageable): Page<UserDto> =
-        userRepository.findAll(pageable).map { entityMapper.map(it) }
+        userRepository.findAll(pageable).map { it.toDto() }
 
     override fun getById(id: Long): UserDto =
-        userRepository.findByIdOrNull(id)?.let { entityMapper.map(it) } ?: throw UserException.NotFound.from(id)
+        userRepository.findByIdOrNull(id)?.toDto() ?: throw UserException.NotFound.from(id)
 
     override fun save(dto: UserDto): UserDto =
-        userRepository.save(dtoMapper.map(dto)).let { entityMapper.map(it) }
+        userRepository.save(dto.toEntity()).toDto()
 
     override fun update(id: Long, dto: UserDto): UserDto {
-        val user = dtoMapper.map(dto)
+        val user = dto.toEntity()
         // Create new entity if it does not exist
         user.id = if (userRepository.existsById(id)) id else 0
 
-        return userRepository.save(user).let { entityMapper.map(it) }
+        return userRepository.save(user).toDto()
     }
 
     override fun delete(id: Long) {
@@ -45,6 +41,6 @@ class UserServiceImpl(
 
     override fun findGroups(userId: Long): List<GroupDto> {
         val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
-        return user.groups.map { groupMapper.map(it) }
+        return user.groups.map { it.toDto() }
     }
 }

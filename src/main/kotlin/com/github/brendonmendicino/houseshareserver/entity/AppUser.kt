@@ -1,15 +1,26 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Entity
-import jakarta.persistence.ManyToMany
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import java.time.OffsetDateTime
 
 @Entity
+@Table(
+    indexes = [
+        Index(columnList = "jti")
+    ]
+)
 class AppUser(
     var username: String,
+    var email: String?,
+    var firstName: String?,
+    var lastName: String?,
+    /**
+     * Json-web-Token ID. Specify if this user was created using
+     * the Oauth2 authentication flow.
+     */
+    @Column(unique = true)
+    var jti: String?,
 ) : BaseEntity() {
     @CreationTimestamp
     lateinit var createdAt: OffsetDateTime

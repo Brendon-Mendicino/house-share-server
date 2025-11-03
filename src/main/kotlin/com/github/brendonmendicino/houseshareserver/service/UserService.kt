@@ -5,4 +5,6 @@ import com.github.brendonmendicino.houseshareserver.dto.UserDto
 
 interface UserService : CrudService<UserDto> {
     fun findGroups(userId: Long): List<GroupDto>
+
+    fun findUserBySub(userSub: String): UserDto
 }

@@ -8,7 +8,7 @@ fun UserDto.toEntity() = AppUser(
     firstName = firstName,
     lastName = lastName,
     email = email,
-    jti = null,
+    sub = null,
 )
 
 fun AppUser.toDto() = UserDto(

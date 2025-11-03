@@ -8,5 +8,5 @@ fun OidcIdToken.toUserEntity() = AppUser(
     email = email,
     firstName = givenName,
     lastName = familyName,
-    jti = claims["jti"]?.toString(),
+    sub = subject,
 )

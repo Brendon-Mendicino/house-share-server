@@ -43,4 +43,8 @@ class UserServiceImpl(
         val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
         return user.groups.map { it.toDto() }
     }
+
+    override fun findUserBySub(userSub: String): UserDto {
+        return userRepository.findBySub(userSub)?.toDto() ?: throw UserException.NotFound("No user found")
+    }
 }

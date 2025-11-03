@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
 @Configuration
@@ -87,8 +86,9 @@ class SecurityConfig(
             }
             .oauth2Login { loginConfigurer ->
                 loginConfigurer.userInfoEndpoint {
-                    it.userAuthoritiesMapper(userAuthoritiesMapper())
+                    it
                         .oidcUserService(oidcUserService)
+                        .userAuthoritiesMapper(userAuthoritiesMapper())
                 }
             }
             .exceptionHandling {
@@ -106,8 +106,6 @@ class SecurityConfig(
                 it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 it.csrfTokenRequestHandler(SpaCsrfTokenRequestHandler())
             }
-            // Provide CSRF cookie
-            .addFilterAfter(CsrfCookieFilter(), BasicAuthenticationFilter::class.java)
             .build()
     }
 

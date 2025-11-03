@@ -7,7 +7,7 @@ import java.time.OffsetDateTime
 @Entity
 @Table(
     indexes = [
-        Index(columnList = "jti")
+        Index(columnList = "sub")
     ]
 )
 class AppUser(
@@ -16,11 +16,11 @@ class AppUser(
     var firstName: String?,
     var lastName: String?,
     /**
-     * Json-web-Token ID. Specify if this user was created using
-     * the Oauth2 authentication flow.
+     * OAuth2 User ID. Specify if this user was created using
+     * the OAuth2 authentication flow.
      */
     @Column(unique = true)
-    var jti: String?,
+    var sub: String?,
 ) : BaseEntity() {
     @CreationTimestamp
     lateinit var createdAt: OffsetDateTime

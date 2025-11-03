@@ -3,6 +3,7 @@ package com.github.brendonmendicino.houseshareserver.mapper
 import com.github.brendonmendicino.houseshareserver.dto.CheckDto
 import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
 import com.github.brendonmendicino.houseshareserver.entity.ShoppingItem
+import com.github.brendonmendicino.houseshareserver.util.mapNotNull
 
 fun ShoppingItem.toDto() = ShoppingItemDto(
     id = id,
@@ -16,5 +17,5 @@ fun ShoppingItem.toDto() = ShoppingItemDto(
     check = Pair(
         checkingUser?.id,
         checkoffTimestamp
-    ).let { (id, time) -> if (id == null || time == null) null else CheckDto(id, time) },
+    ).mapNotNull { id, time -> CheckDto(id, time) }
 )

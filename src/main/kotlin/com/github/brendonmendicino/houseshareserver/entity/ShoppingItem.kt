@@ -7,7 +7,7 @@ import jakarta.persistence.ManyToOne
 import java.time.OffsetDateTime
 
 @Entity
-class ShoppingItem constructor(
+class ShoppingItem(
     var name: String,
     var amount: Int,
     var price: Double?,

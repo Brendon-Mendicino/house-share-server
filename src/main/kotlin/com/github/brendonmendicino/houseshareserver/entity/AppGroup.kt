@@ -1,9 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
-import jakarta.persistence.Embedded
-import jakarta.persistence.Entity
-import jakarta.persistence.ManyToMany
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 
 @Entity
 class AppGroup(
@@ -14,6 +11,7 @@ class AppGroup(
     lateinit var audit: Auditable
 
     @ManyToMany
+    @JoinTable(name = "app_group_app_user")
     var users: MutableSet<AppUser> = mutableSetOf()
 
     @OneToMany(mappedBy = "appGroup")

@@ -40,6 +40,11 @@ class AppUser(
     @OneToMany(mappedBy = "payer", cascade = [CascadeType.MERGE])
     var payedExpenses: MutableSet<Expense> = mutableSetOf()
 
+    @OneToMany(mappedBy = "userPart")
+    var userExpenseParts: MutableSet<ExpensePart> = mutableSetOf()
+
+
+
     fun addShoppingItem(item: ShoppingItem) {
         shoppingItems.add(item)
         item.owner = this

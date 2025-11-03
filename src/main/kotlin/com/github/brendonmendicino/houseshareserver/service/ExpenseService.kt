@@ -1,4 +1,4 @@
 package com.github.brendonmendicino.houseshareserver.service
 
-interface ShoppingItemService {
+interface ExpenseService {
 }

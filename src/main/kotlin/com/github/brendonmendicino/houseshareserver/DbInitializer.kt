@@ -6,9 +6,11 @@ import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
 import com.github.brendonmendicino.houseshareserver.dto.UserDto
 import com.github.brendonmendicino.houseshareserver.entity.ShoppingItemPriority
 import com.github.brendonmendicino.houseshareserver.service.GroupService
-import com.github.brendonmendicino.houseshareserver.service.ShoppingItemService
 import com.github.brendonmendicino.houseshareserver.service.UserService
 import org.springframework.boot.CommandLineRunner
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
 
@@ -16,9 +18,13 @@ import java.time.OffsetDateTime
 class DbInitializer(
     private val userService: UserService,
     private val groupService: GroupService,
-    private val shoppingItemService: ShoppingItemService
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
+        val role = "ROLE_admin"
+        val authorities = AuthorityUtils.createAuthorityList(role)
+        val authentication = UsernamePasswordAuthenticationToken("command_line_runner", role, authorities)
+        SecurityContextHolder.getContext().authentication = authentication
+
         userService.save(UserDto(0, "brendon", null, null, null))
         userService.save(UserDto(0, "flavy", null, null, null))
         userService.save(UserDto(0, "salvo", null, null, null))
@@ -80,8 +86,8 @@ class DbInitializer(
             )
         )
 
-        shoppingItemService.checkShoppingItem(6, CheckDto(1, OffsetDateTime.now()))
-        shoppingItemService.checkShoppingItem(7, CheckDto(1, OffsetDateTime.now()))
-        shoppingItemService.checkShoppingItem(8, CheckDto(2, OffsetDateTime.now()))
+        groupService.checkShoppingItem(1, 6, CheckDto(1, OffsetDateTime.now()))
+        groupService.checkShoppingItem(1, 7, CheckDto(1, OffsetDateTime.now()))
+        groupService.checkShoppingItem(1, 8, CheckDto(2, OffsetDateTime.now()))
     }
 }

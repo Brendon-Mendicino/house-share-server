@@ -1,8 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
-import jakarta.persistence.Embedded
-import jakarta.persistence.Entity
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 
 @Entity
 class Expense(
@@ -17,11 +15,24 @@ class Expense(
     var payer: AppUser,
     @ManyToOne
     var group: AppGroup,
+
+    @OneToMany(mappedBy = "partOf", cascade = [CascadeType.ALL])
+    var expenseParts: MutableSet<ExpensePart> = mutableSetOf()
 ) : BaseEntity() {
     @Embedded
     lateinit var audit: Auditable
+
+    fun addExpensePart(part: ExpensePart) {
+        expenseParts.add(part)
+        part.partOf = this
+    }
+
+    fun removeExpensePart(part: ExpensePart) {
+        expenseParts.remove(part)
+    }
 }
 
+@Suppress("unused")
 enum class ExpenseCategory {
     Car,
     Education,

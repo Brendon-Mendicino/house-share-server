@@ -10,4 +10,12 @@ sealed class GroupException(override val message: String, override val cause: Th
             fun from(id: Long) = NotFound("Group with id $id not found")
         }
     }
+
+    data class NotMember(override val message: String, override val cause: Throwable? = null) :
+        GroupException(message, cause) {
+        companion object {
+            @JvmStatic
+            fun from(groupId: Long, userId: Long) = NotMember("User@$userId is not a member of Group@$groupId")
+        }
+    }
 }

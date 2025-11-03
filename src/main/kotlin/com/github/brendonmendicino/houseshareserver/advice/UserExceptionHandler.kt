@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class UserExceptionHandler {
-    @ExceptionHandler(UserException.NotFound::class)
-    fun handleUserExceptionNotFound(e: UserException) = ProblemDetail
+    @ExceptionHandler(UserException.NotFound::class, UserException.DuplicateId::class)
+    fun handleGenericException(e: UserException) = ProblemDetail
         .forStatusAndDetail(HttpStatus.NOT_FOUND, e.message)
 }

@@ -1,5 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.controller
 
+import com.github.brendonmendicino.houseshareserver.dto.CheckDto
 import com.github.brendonmendicino.houseshareserver.dto.GroupDto
 import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
 import com.github.brendonmendicino.houseshareserver.service.GroupService
@@ -25,4 +26,17 @@ class GroupController(
     @GetMapping("/{groupId}/shopping-items")
     fun getShoppingItems(@PathVariable groupId: Long, pageable: Pageable) =
         groupService.getShoppingItems(groupId, pageable)
+
+    @PostMapping("/{groupId}/shopping-items/{shoppingItemId}/checkoff")
+    fun checkShoppingItem(
+        @PathVariable groupId: Long,
+        @PathVariable shoppingItemId: Long,
+        @RequestBody dto: CheckDto
+    ) = groupService.checkShoppingItem(groupId, shoppingItemId, dto)
+
+    @DeleteMapping("/{groupId}/shopping-items/{shoppingItemId}/checkoff")
+    fun uncheckShoppingItem(
+        @PathVariable groupId: Long,
+        @PathVariable shoppingItemId: Long,
+    ) = groupService.uncheckShoppingItem(groupId, shoppingItemId)
 }

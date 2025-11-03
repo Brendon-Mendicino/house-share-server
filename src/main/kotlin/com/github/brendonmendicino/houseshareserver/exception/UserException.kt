@@ -10,4 +10,12 @@ sealed class UserException(override val message: String, override val cause: Thr
             fun from(id: Long) = NotFound("User with id $id not found")
         }
     }
+
+    data class DuplicateId(override val message: String, override val cause: Throwable? = null) :
+        UserException(message, cause) {
+        companion object {
+            @JvmStatic
+            fun from(id: Long) = NotFound("User@$id was duplicated")
+        }
+    }
 }

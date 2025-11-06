@@ -1,6 +1,7 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.ManyToOne
 
 
@@ -8,7 +9,7 @@ import jakarta.persistence.ManyToOne
 class ExpensePart(
     var partAmount: Double,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     var partOf: Expense,
 
     @ManyToOne

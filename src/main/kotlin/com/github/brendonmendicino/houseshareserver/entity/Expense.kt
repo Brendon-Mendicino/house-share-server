@@ -16,7 +16,7 @@ class Expense(
     @ManyToOne
     var group: AppGroup,
 
-    @OneToMany(mappedBy = "partOf", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "partOf", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     var expenseParts: MutableSet<ExpensePart> = mutableSetOf()
 ) : BaseEntity() {
     @Embedded

@@ -64,6 +64,8 @@ class GroupServiceImpl(
         val owner =
             groupRepository.findUserById(groupId, itemDto.ownerId) ?: throw UserException.NotFound.from(itemDto.ownerId)
 
+        checkUserInGroup(groupId, owner.id)
+
         val item = ShoppingItem(
             owner = owner,
             appGroup = group,

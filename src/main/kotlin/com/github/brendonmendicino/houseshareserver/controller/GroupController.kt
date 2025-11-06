@@ -1,6 +1,7 @@
 package com.github.brendonmendicino.houseshareserver.controller
 
 import com.github.brendonmendicino.houseshareserver.dto.CheckDto
+import com.github.brendonmendicino.houseshareserver.dto.ExpenseDto
 import com.github.brendonmendicino.houseshareserver.dto.GroupDto
 import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
 import com.github.brendonmendicino.houseshareserver.service.GroupService
@@ -31,6 +32,7 @@ class GroupController(
     fun checkShoppingItem(
         @PathVariable groupId: Long,
         @PathVariable shoppingItemId: Long,
+        @Valid
         @RequestBody dto: CheckDto
     ) = groupService.checkShoppingItem(groupId, shoppingItemId, dto)
 
@@ -39,4 +41,11 @@ class GroupController(
         @PathVariable groupId: Long,
         @PathVariable shoppingItemId: Long,
     ) = groupService.uncheckShoppingItem(groupId, shoppingItemId)
+
+    @GetMapping("/{groupId}/expenses")
+    fun getExpenses(@PathVariable groupId: Long, pageable: Pageable) = groupService.getExpenses(groupId, pageable)
+
+    @PostMapping("/{groupId}/expenses")
+    fun addExpense(@PathVariable groupId: Long, @Valid @RequestBody dto: ExpenseDto) =
+        groupService.addExpense(groupId, dto)
 }

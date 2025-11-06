@@ -39,6 +39,7 @@ class ShoppingItem(
     }
 }
 
+@Suppress("unused")
 enum class ShoppingItemPriority {
     Now,
     Soon,

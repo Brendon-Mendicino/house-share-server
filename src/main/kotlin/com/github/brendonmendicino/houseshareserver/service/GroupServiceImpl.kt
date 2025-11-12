@@ -13,6 +13,7 @@ import com.github.brendonmendicino.houseshareserver.repository.ExpenseRepository
 import com.github.brendonmendicino.houseshareserver.repository.GroupRepository
 import com.github.brendonmendicino.houseshareserver.repository.ShoppingItemRepository
 import com.github.brendonmendicino.houseshareserver.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -28,6 +29,10 @@ class GroupServiceImpl(
     private val expenseRepository: ExpenseRepository,
     private val userRepository: UserRepository,
 ) : GroupService {
+    companion object {
+        private val logger = LoggerFactory.getLogger(GroupServiceImpl::class.java)
+    }
+
     private fun checkUserInGroup(groupId: Long, userId: Long) {
         if (!groupRepository.existsUserById(groupId, userId))
             throw GroupException.NotMember.from(groupId, userId)
@@ -147,6 +152,7 @@ class GroupServiceImpl(
         return expense
     }
 
+    @PreAuthorize("hasRole('admin')")
     override fun getAll(pageable: Pageable): Page<GroupDto> =
         groupRepository.findAll(pageable).map { it.toDto() }
 
@@ -154,7 +160,9 @@ class GroupServiceImpl(
     override fun getById(id: Long): GroupDto =
         groupRepository.findByIdOrNull(id)?.toDto() ?: throw GroupException.NotFound.from(id)
 
-    override fun save(dto: GroupDto): GroupDto = groupRepository.save(createGroup(dto)).toDto()
+    override fun save(dto: GroupDto): GroupDto =
+        groupRepository.save(createGroup(dto)).toDto()
+            .also { logger.info("Created Group@${it.id}") }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#id)")
     override fun update(
@@ -166,11 +174,13 @@ class GroupServiceImpl(
         group.id = if (groupRepository.existsById(id)) id else 0
 
         return groupRepository.save(group).toDto()
+            .also { logger.info("Updated Group@${it.id}") }
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#id)")
     override fun delete(id: Long) {
         groupRepository.deleteById(id)
+        logger.info("Deleted Group@${id}")
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
@@ -184,6 +194,7 @@ class GroupServiceImpl(
         group.addUser(user)
 
         return groupRepository.save(group).toDto()
+            .also { logger.info("Added User@$userId to Group@$groupId") }
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
@@ -193,11 +204,24 @@ class GroupServiceImpl(
         group.removeUser(userId)
 
         return groupRepository.save(group).toDto()
+            .also { logger.info("Removed User@$userId from Group@$groupId") }
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun getUsers(groupId: Long): List<UserDto> {
+        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
+        return group.users.map { it.toDto() }
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun getUserById(groupId: Long, userId: Long): UserDto {
+        return groupRepository.findUserById(groupId, userId)?.toDto() ?: throw UserException.NotFound.from(userId)
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun addShoppingItem(groupId: Long, item: ShoppingItemDto): ShoppingItemDto =
         shoppingItemRepository.save(createShoppingItem(groupId, item)).toDto()
+            .also { logger.info("Added ShoppingItem@${it.id} to Group@$groupId") }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun getShoppingItems(groupId: Long, pageable: Pageable): Page<ShoppingItemDto> =
@@ -218,6 +242,7 @@ class GroupServiceImpl(
 
         return shoppingItemRepository.save(shoppingItem)
             .let { CheckDto(it.checkingUser!!.id, it.checkoffTimestamp!!) }
+            .also { logger.info("Checked ShoppingItem@$shoppingItemId") }
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
@@ -226,6 +251,7 @@ class GroupServiceImpl(
 
         shoppingItem.uncheck()
         shoppingItemRepository.save(shoppingItem)
+            .also { logger.info("Unchecked ShoppingItem@$shoppingItemId") }
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
@@ -233,6 +259,7 @@ class GroupServiceImpl(
         groupId: Long,
         expense: ExpenseDto
     ): ExpenseDto = expenseRepository.save(createExpense(groupId, expense)).toDto()
+        .also { logger.info("Added Expense@${it.id} to Group@$groupId") }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun getExpenses(

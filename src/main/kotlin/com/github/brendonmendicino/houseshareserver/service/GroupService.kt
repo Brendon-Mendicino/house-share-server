@@ -1,9 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.service
 
-import com.github.brendonmendicino.houseshareserver.dto.CheckDto
-import com.github.brendonmendicino.houseshareserver.dto.ExpenseDto
-import com.github.brendonmendicino.houseshareserver.dto.GroupDto
-import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
+import com.github.brendonmendicino.houseshareserver.dto.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -11,6 +8,10 @@ interface GroupService : CrudService<GroupDto> {
     fun addUser(groupId: Long, userId: Long): GroupDto
 
     fun removeUser(groupId: Long, userId: Long): GroupDto
+
+    fun getUsers(groupId: Long): List<UserDto>
+
+    fun getUserById(groupId: Long, userId: Long): UserDto
 
     fun addShoppingItem(groupId: Long, item: ShoppingItemDto): ShoppingItemDto
 

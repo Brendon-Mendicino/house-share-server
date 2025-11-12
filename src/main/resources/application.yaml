@@ -31,8 +31,11 @@ spring:
               - openid
               - offline_access
             authorization-grant-type: authorization_code
-            redirect-uri: app://lol.terabrendon.houseshare2
+            redirect-uri: app://lol.terabrendon.houseshare2/login
 
+logging:
+  file:
+    path: logging
 
 springdoc:
   swagger-ui:
@@ -42,3 +45,5 @@ springdoc:
 
 server:
   port: 9090
+
+debug: true

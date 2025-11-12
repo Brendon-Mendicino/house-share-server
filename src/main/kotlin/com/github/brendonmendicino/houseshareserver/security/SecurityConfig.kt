@@ -35,7 +35,7 @@ class SecurityConfig(
      */
     fun oidcLogoutSuccessHandler() = OidcClientInitiatedLogoutSuccessHandler(crr)
         // TODO: change
-        .also { it.setPostLogoutRedirectUri("http://localhost:${port}") }
+        .also { it.setPostLogoutRedirectUri("{baseUrl}") }
 
     /**
      * Maps roles from the keycloak userInfo to Spring roles.

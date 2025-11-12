@@ -2,6 +2,7 @@ package com.github.brendonmendicino.houseshareserver.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import java.net.URI
 import java.time.OffsetDateTime
 
 @Entity
@@ -21,6 +22,8 @@ class AppUser(
      */
     @Column(unique = true)
     var sub: String?,
+
+    var picture: URI?,
 ) : BaseEntity() {
     @CreationTimestamp
     lateinit var createdAt: OffsetDateTime

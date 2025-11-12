@@ -14,10 +14,20 @@ class AuthorizationService(private val userRepository: UserRepository) {
         private val logger = LoggerFactory.getLogger(AuthorizationService::class.java)
     }
 
+    private val oidcPrincipal: OidcUser?
+        get() = SecurityContextHolder.getContext().authentication?.principal as? OidcUser
+
     @Transactional(readOnly = true)
     fun isMemberOf(groupId: Long): Boolean {
-        val principal = SecurityContextHolder.getContext().authentication?.principal as? OidcUser ?: return false
+        val principal = oidcPrincipal ?: return false
         val user = userRepository.findBySub(principal.subject) ?: return false
         return user.groups.contains(BaseEntity(groupId))
+    }
+
+    @Transactional(readOnly = true)
+    fun isSelf(userId: Long): Boolean {
+        val principal = oidcPrincipal ?: return false
+        val user = userRepository.findBySub(principal.subject) ?: return false
+        return user.id == userId
     }
 }

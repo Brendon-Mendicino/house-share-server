@@ -20,6 +20,12 @@ class GroupController(
     @DeleteMapping("/{groupId}/users/{userId}")
     fun deleteUser(@PathVariable groupId: Long, @PathVariable userId: Long) = groupService.removeUser(groupId, userId)
 
+    @GetMapping("/{groupId}/users")
+    fun getUsers(@PathVariable groupId: Long) = groupService.getUsers(groupId)
+
+    @GetMapping("/{groupId}/users/{userId}")
+    fun getUserById(@PathVariable groupId: Long, @PathVariable userId: Long) = groupService.getUserById(groupId, userId)
+
     @PostMapping("/{groupId}/shopping-items")
     fun addShoppingItem(@PathVariable groupId: Long, @Valid @RequestBody item: ShoppingItemDto) =
         groupService.addShoppingItem(groupId, item)

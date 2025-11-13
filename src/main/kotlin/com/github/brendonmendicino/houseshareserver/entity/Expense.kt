@@ -4,7 +4,6 @@ import jakarta.persistence.*
 
 @Entity
 class Expense(
-    var amount: Double,
     var category: ExpenseCategory,
     var title: String,
     var description: String?,
@@ -21,6 +20,9 @@ class Expense(
 ) : BaseEntity() {
     @Embedded
     lateinit var audit: Auditable
+
+    val amount: Double
+        get() = expenseParts.sumOf { it.partAmount }
 
     fun addExpensePart(part: ExpensePart) {
         expenseParts.add(part)

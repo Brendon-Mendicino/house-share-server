@@ -135,7 +135,6 @@ class GroupServiceImpl(
             group = group,
             payer = payer,
             title = expenseDto.title,
-            amount = expenseDto.amount,
             category = expenseDto.category,
             description = expenseDto.description,
         )

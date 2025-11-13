@@ -8,7 +8,6 @@ import com.github.brendonmendicino.houseshareserver.entity.ExpensePart
 fun Expense.toDto() = ExpenseDto(
     id = id,
     description = description,
-    amount = amount,
     title = title,
     category = category,
     ownerId = owner.id,

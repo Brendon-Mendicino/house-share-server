@@ -1,4 +1,7 @@
 spring:
+  mvc:
+    log-request-details: true
+
   application:
     name: house-share-server
 

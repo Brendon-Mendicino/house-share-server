@@ -14,7 +14,7 @@ class AppGroup(
     @JoinTable(name = "app_group_app_user")
     var users: MutableSet<AppUser> = mutableSetOf()
 
-    @OneToMany(mappedBy = "appGroup")
+    @OneToMany(mappedBy = "group")
     var shoppingItems: MutableSet<ShoppingItem> = mutableSetOf()
 
     @OneToMany(mappedBy = "group")
@@ -34,7 +34,7 @@ class AppGroup(
 
     fun addShoppingItem(shoppingItem: ShoppingItem) {
         shoppingItems.add(shoppingItem)
-        shoppingItem.appGroup = this
+        shoppingItem.group = this
     }
 
     fun removeShoppingItem(shoppingItemId: Long) {

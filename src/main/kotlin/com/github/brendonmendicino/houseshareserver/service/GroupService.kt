@@ -28,4 +28,8 @@ interface GroupService : CrudService<GroupDto> {
     fun addExpense(groupId: Long, expense: ExpenseDto): ExpenseDto
 
     fun getExpenses(groupId: Long, pageable: Pageable): Page<ExpenseDto>
+
+    fun updateExpense(groupId: Long, expenseId: Long, dto: ExpenseDto): ExpenseDto
+
+    fun deleteExpense(groupId: Long, expenseId: Long)
 }

@@ -65,4 +65,12 @@ class GroupController(
     @PostMapping("/{groupId}/expenses")
     fun addExpense(@PathVariable groupId: Long, @Valid @RequestBody dto: ExpenseDto) =
         groupService.addExpense(groupId, dto)
+
+    @PutMapping("/{groupId}/expenses/{expenseId}")
+    fun updateExpense(@PathVariable groupId: Long, @PathVariable expenseId: Long, @Valid @RequestBody dto: ExpenseDto) =
+        groupService.updateExpense(groupId, expenseId, dto)
+
+    @DeleteMapping("/{groupId}/expenses/{expenseId}")
+    fun deleteExpense(@PathVariable groupId: Long, @PathVariable expenseId: Long) =
+        groupService.deleteExpense(groupId, expenseId)
 }

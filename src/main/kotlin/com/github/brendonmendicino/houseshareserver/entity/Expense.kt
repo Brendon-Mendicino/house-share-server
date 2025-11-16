@@ -13,9 +13,10 @@ class Expense(
     @ManyToOne
     var payer: AppUser,
     @ManyToOne
+    @JoinColumn(updatable = false)
     var group: AppGroup,
 
-    @OneToMany(mappedBy = "partOf", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "partOf", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     var expenseParts: MutableSet<ExpensePart> = mutableSetOf()
 ) : BaseEntity() {
     @Embedded
@@ -27,6 +28,15 @@ class Expense(
      */
     val totalAmount: Long
         get() = expenseParts.sumOf { it.partAmount }
+
+    fun update(other: Expense) {
+        category = other.category
+        title = other.title
+        description = other.description
+        owner = other.owner
+        payer = other.payer
+//        expenseParts = other.expenseParts
+    }
 
     fun addExpensePart(part: ExpensePart) {
         expenseParts.add(part)

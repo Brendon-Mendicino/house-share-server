@@ -7,10 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 
 interface ShoppingItemRepository : JpaRepository<ShoppingItem, Long> {
-    @Query("select s from ShoppingItem s where s.appGroup.id = :groupId")
+    @Query("select s from ShoppingItem s where s.group.id = :groupId")
     fun findAllByGroupId(groupId: Long, pageable: Pageable): Page<ShoppingItem>
 
-    fun findByIdAndAppGroupId(shoppingItemId: Long, groupId: Long): ShoppingItem?
+    fun findByIdAndGroupId(shoppingItemId: Long, groupId: Long): ShoppingItem?
 
-    fun deleteByIdAndAppGroupId(shoppingItemId: Long, groupId: Long)
+    fun deleteByIdAndGroupId(shoppingItemId: Long, groupId: Long)
 }

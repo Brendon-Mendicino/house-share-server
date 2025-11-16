@@ -1,10 +1,8 @@
 package com.github.brendonmendicino.houseshareserver.service
 
 import com.github.brendonmendicino.houseshareserver.dto.*
-import com.github.brendonmendicino.houseshareserver.entity.AppGroup
-import com.github.brendonmendicino.houseshareserver.entity.Expense
-import com.github.brendonmendicino.houseshareserver.entity.ExpensePart
-import com.github.brendonmendicino.houseshareserver.entity.ShoppingItem
+import com.github.brendonmendicino.houseshareserver.entity.*
+import com.github.brendonmendicino.houseshareserver.exception.ExpenseException
 import com.github.brendonmendicino.houseshareserver.exception.GroupException
 import com.github.brendonmendicino.houseshareserver.exception.ShoppingItemException
 import com.github.brendonmendicino.houseshareserver.exception.UserException
@@ -44,6 +42,10 @@ class GroupServiceImpl(
         }
     }
 
+    private fun getGroupUser(groupId: Long, userId: Long): AppUser {
+        return groupRepository.findUserById(groupId, userId) ?: throw UserException.NotFound.from(userId)
+    }
+
     /**
      * Creates a [AppGroup] with its users.
      */
@@ -73,7 +75,7 @@ class GroupServiceImpl(
 
         val item = ShoppingItem(
             owner = owner,
-            appGroup = group,
+            group = group,
             name = itemDto.name,
             amount = itemDto.amount,
             price = itemDto.price,
@@ -229,7 +231,7 @@ class GroupServiceImpl(
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun updateShoppingItem(groupId: Long, shoppingItemId: Long, item: ShoppingItemDto): ShoppingItemDto {
-        val entity = shoppingItemRepository.findByIdAndAppGroupId(shoppingItemId, groupId)
+        val entity = shoppingItemRepository.findByIdAndGroupId(shoppingItemId, groupId)
             ?: throw ShoppingItemException.NotFound.from(shoppingItemId)
 
         entity.update(item)
@@ -240,13 +242,13 @@ class GroupServiceImpl(
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun removeShoppingItem(groupId: Long, shoppingItemId: Long) {
-        shoppingItemRepository.deleteByIdAndAppGroupId(shoppingItemId, groupId)
+        shoppingItemRepository.deleteByIdAndGroupId(shoppingItemId, groupId)
         logger.info("Deleted ShoppingItem@${shoppingItemId}")
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun checkShoppingItem(groupId: Long, shoppingItemId: Long, dto: CheckDto): CheckDto {
-        val shoppingItem = shoppingItemRepository.findByIdAndAppGroupId(shoppingItemId, groupId)
+        val shoppingItem = shoppingItemRepository.findByIdAndGroupId(shoppingItemId, groupId)
             ?: throw ShoppingItemException.NotFound.from(shoppingItemId)
 
         val user =
@@ -263,7 +265,7 @@ class GroupServiceImpl(
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun uncheckShoppingItem(groupId: Long, shoppingItemId: Long) {
-        val shoppingItem = shoppingItemRepository.findByIdAndAppGroupId(shoppingItemId, groupId) ?: return
+        val shoppingItem = shoppingItemRepository.findByIdAndGroupId(shoppingItemId, groupId) ?: return
 
         shoppingItem.uncheck()
         shoppingItemRepository.save(shoppingItem)
@@ -282,4 +284,30 @@ class GroupServiceImpl(
         groupId: Long,
         pageable: Pageable
     ): Page<ExpenseDto> = expenseRepository.findAllByGroupId(groupId, pageable).map { it.toDto() }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun updateExpense(groupId: Long, expenseId: Long, dto: ExpenseDto): ExpenseDto {
+        val entity =
+            expenseRepository.findByIdAndGroupId(expenseId, groupId) ?: throw ExpenseException.NotFound.from(expenseId)
+
+        entity.category = dto.category
+        entity.title = dto.title
+        entity.description = dto.description
+        entity.owner = getGroupUser(groupId, dto.ownerId)
+        entity.payer = getGroupUser(groupId, dto.payerId)
+
+        entity.expenseParts.clear()
+        for (part in dto.expenseParts) {
+            createExpensePart(part, entity)
+        }
+
+        return expenseRepository.save(entity).toDto()
+            .also { logger.info("Updated Expense@${it.id} from Group@$groupId") }
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun deleteExpense(groupId: Long, expenseId: Long) {
+        expenseRepository.deleteByIdAndGroupId(expenseId, groupId)
+        logger.info("Deleted Expense@$expenseId in Group@$groupId")
+    }
 }

@@ -21,7 +21,7 @@ class ShoppingItem(
     @ManyToOne(fetch = FetchType.EAGER)
     var owner: AppUser,
     @ManyToOne(fetch = FetchType.EAGER)
-    var appGroup: AppGroup,
+    var group: AppGroup,
 ) : BaseEntity() {
     @Embedded
     lateinit var audit: Auditable

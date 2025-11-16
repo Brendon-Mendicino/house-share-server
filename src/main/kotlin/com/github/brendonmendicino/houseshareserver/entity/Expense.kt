@@ -21,7 +21,11 @@ class Expense(
     @Embedded
     lateinit var audit: Auditable
 
-    val amount: Double
+    /**
+     * This amount represent cents. This conversion goes as:
+     * `1.02 euro == 102 totalAmount`
+     */
+    val totalAmount: Long
         get() = expenseParts.sumOf { it.partAmount }
 
     fun addExpensePart(part: ExpensePart) {

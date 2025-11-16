@@ -101,24 +101,24 @@ class DbInitializer(
         groupService.addExpense(
             1, ExpenseDto(
                 0, ExpenseCategory.Home, "patate", null, 1, 1, 1, OffsetDateTime.now(), listOf(
-                    ExpensePartDto(0, 0, 1, 5.0),
-                    ExpensePartDto(0, 0, 2, 5.0),
+                    ExpensePartDto(0, 0, 1, 5),
+                    ExpensePartDto(0, 0, 2, 5),
                 )
             )
         )
         groupService.addExpense(
             1, ExpenseDto(
                 0, ExpenseCategory.Home, "Cipulle", null, 1, 1, 1, OffsetDateTime.now(), listOf(
-                    ExpensePartDto(0, 0, 2, 10.0),
-                    ExpensePartDto(0, 0, 3, 10.0),
+                    ExpensePartDto(0, 0, 2, 10),
+                    ExpensePartDto(0, 0, 3, 10),
                 )
             )
         )
         groupService.addExpense(
             1, ExpenseDto(
                 0, ExpenseCategory.Home, "polpa", null, 1, 1, 1, OffsetDateTime.now(), listOf(
-                    ExpensePartDto(0, 0, 1, 5.0),
-                    ExpensePartDto(0, 0, 3, 5.0),
+                    ExpensePartDto(0, 0, 1, 5),
+                    ExpensePartDto(0, 0, 3, 5),
                 )
             )
         )

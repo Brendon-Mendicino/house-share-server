@@ -7,7 +7,11 @@ import jakarta.persistence.ManyToOne
 
 @Entity
 class ExpensePart(
-    var partAmount: Double,
+    /**
+     * This amount represent cents. This conversion goes as:
+     * `1.02 euro == 102 partAmount`
+     */
+    var partAmount: Long,
 
     @ManyToOne(fetch = FetchType.EAGER)
     var partOf: Expense,

@@ -1,11 +1,11 @@
 package com.github.brendonmendicino.houseshareserver.dto
 
-import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.Min
 
 data class ExpensePartDto(
     val id: Long,
     val expenseId: Long,
     val userId: Long,
-    @field:DecimalMin("0.01")
-    val partAmount: Double,
+    @field:Min(1)
+    val partAmount: Long,
 )

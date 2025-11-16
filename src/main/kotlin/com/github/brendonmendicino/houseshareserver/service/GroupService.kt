@@ -17,6 +17,10 @@ interface GroupService : CrudService<GroupDto> {
 
     fun getShoppingItems(groupId: Long, pageable: Pageable): Page<ShoppingItemDto>
 
+    fun updateShoppingItem(groupId: Long, shoppingItemId: Long, item: ShoppingItemDto): ShoppingItemDto
+
+    fun removeShoppingItem(groupId: Long, shoppingItemId: Long)
+
     fun checkShoppingItem(groupId: Long, shoppingItemId: Long, dto: CheckDto): CheckDto
 
     fun uncheckShoppingItem(groupId: Long, shoppingItemId: Long)

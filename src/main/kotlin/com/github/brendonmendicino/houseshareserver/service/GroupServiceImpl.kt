@@ -228,6 +228,23 @@ class GroupServiceImpl(
             .findAllByGroupId(groupId, pageable).map { it.toDto() }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun updateShoppingItem(groupId: Long, shoppingItemId: Long, item: ShoppingItemDto): ShoppingItemDto {
+        val entity = shoppingItemRepository.findByIdAndAppGroupId(shoppingItemId, groupId)
+            ?: throw ShoppingItemException.NotFound.from(shoppingItemId)
+
+        entity.update(item)
+
+        return shoppingItemRepository.save(entity).toDto()
+            .also { logger.info("Updated ShoppingItem@${it.id} from Group@$groupId") }
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun removeShoppingItem(groupId: Long, shoppingItemId: Long) {
+        shoppingItemRepository.deleteByIdAndAppGroupId(shoppingItemId, groupId)
+        logger.info("Deleted ShoppingItem@${shoppingItemId}")
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun checkShoppingItem(groupId: Long, shoppingItemId: Long, dto: CheckDto): CheckDto {
         val shoppingItem = shoppingItemRepository.findByIdAndAppGroupId(shoppingItemId, groupId)
             ?: throw ShoppingItemException.NotFound.from(shoppingItemId)

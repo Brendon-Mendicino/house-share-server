@@ -1,5 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
+import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -24,6 +25,13 @@ class ShoppingItem(
 ) : BaseEntity() {
     @Embedded
     lateinit var audit: Auditable
+
+    fun update(dto: ShoppingItemDto) {
+        name = dto.name
+        amount = dto.amount
+        price = dto.price
+        priority = dto.priority
+    }
 
     fun check(user: AppUser, timestamp: OffsetDateTime) {
         checkoffTimestamp = timestamp

@@ -11,4 +11,6 @@ interface ShoppingItemRepository : JpaRepository<ShoppingItem, Long> {
     fun findAllByGroupId(groupId: Long, pageable: Pageable): Page<ShoppingItem>
 
     fun findByIdAndAppGroupId(shoppingItemId: Long, groupId: Long): ShoppingItem?
+
+    fun deleteByIdAndAppGroupId(shoppingItemId: Long, groupId: Long)
 }

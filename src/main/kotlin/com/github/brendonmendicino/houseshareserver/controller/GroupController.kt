@@ -34,6 +34,17 @@ class GroupController(
     fun getShoppingItems(@PathVariable groupId: Long, pageable: Pageable) =
         groupService.getShoppingItems(groupId, pageable)
 
+    @PutMapping("/{groupId}/shopping-items/{shoppingItemId}")
+    fun updateShoppingItem(
+        @PathVariable groupId: Long,
+        @PathVariable shoppingItemId: Long,
+        @Valid @RequestBody item: ShoppingItemDto
+    ) = groupService.updateShoppingItem(groupId, shoppingItemId, item)
+
+    @DeleteMapping("/{groupId}/shopping-items/{shoppingItemId}")
+    fun deleteShoppingItem(@PathVariable groupId: Long, @PathVariable shoppingItemId: Long) =
+        groupService.removeShoppingItem(groupId, shoppingItemId)
+
     @PostMapping("/{groupId}/shopping-items/{shoppingItemId}/checkoff")
     fun checkShoppingItem(
         @PathVariable groupId: Long,

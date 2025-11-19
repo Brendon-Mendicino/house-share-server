@@ -11,7 +11,11 @@ import java.time.OffsetDateTime
 class ShoppingItem(
     var name: String,
     var amount: Int,
-    var price: Double?,
+    /**
+     * Represent the money compact representation.
+     * Where 1 euro == 100 price.
+     */
+    var price: Long?,
     var priority: ShoppingItemPriority,
 
     var checkoffTimestamp: OffsetDateTime?,

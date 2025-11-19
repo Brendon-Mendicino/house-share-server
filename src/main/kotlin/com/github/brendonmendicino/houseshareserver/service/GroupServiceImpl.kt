@@ -184,11 +184,7 @@ class GroupServiceImpl(
         logger.info("Deleted Group@${id}")
     }
 
-    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
-    override fun addUser(
-        groupId: Long,
-        userId: Long
-    ): GroupDto {
+    internal fun addUserInternal(groupId: Long, userId: Long): GroupDto {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
         val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
 
@@ -197,6 +193,14 @@ class GroupServiceImpl(
         return groupRepository.save(group).toDto()
             .also { logger.info("Added User@$userId to Group@$groupId") }
     }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun addUser(
+        groupId: Long,
+        userId: Long
+    ): GroupDto = addUserInternal(groupId, userId)
+
+    override fun addUserNoMember(groupId: Long, userId: Long): GroupDto = addUserInternal(groupId, userId)
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun removeUser(groupId: Long, userId: Long): GroupDto {

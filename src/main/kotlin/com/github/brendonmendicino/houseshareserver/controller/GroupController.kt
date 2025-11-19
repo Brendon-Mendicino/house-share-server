@@ -4,6 +4,7 @@ import com.github.brendonmendicino.houseshareserver.dto.CheckDto
 import com.github.brendonmendicino.houseshareserver.dto.ExpenseDto
 import com.github.brendonmendicino.houseshareserver.dto.GroupDto
 import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
+import com.github.brendonmendicino.houseshareserver.service.GroupInviteService
 import com.github.brendonmendicino.houseshareserver.service.GroupService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
@@ -13,7 +14,20 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/groups")
 class GroupController(
     private val groupService: GroupService,
+    private val groupInviteService: GroupInviteService,
 ) : CrudController<GroupDto>(groupService) {
+    @PostMapping("/{groupId}/invite")
+    fun inviteUrl(@PathVariable groupId: Long) = groupInviteService.createInviteUrl(groupId)
+
+    @PostMapping("/{groupId}/invite/join")
+    fun joinFromInviteUrl(
+        @PathVariable groupId: Long,
+        @RequestParam expires: Long,
+        @RequestParam nonce: String,
+        @RequestParam signature: String
+    ): GroupDto =
+        groupInviteService.joinFromInviteUrl(groupId)
+
     @PutMapping("/{groupId}/users/{userId}")
     fun addUser(@PathVariable groupId: Long, @PathVariable userId: Long) = groupService.addUser(groupId, userId)
 

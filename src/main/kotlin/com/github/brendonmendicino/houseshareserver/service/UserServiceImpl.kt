@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -60,7 +62,11 @@ class UserServiceImpl(
         return user.groups.map { it.toDto() }
     }
 
-    override fun findUserBySub(userSub: String): UserDto {
-        return userRepository.findBySub(userSub)?.toDto() ?: throw UserException.NotFound("No user found")
+    override fun loggedUser(): UserDto {
+        val authentication =
+            SecurityContextHolder.getContext().authentication ?: throw RuntimeException("User is not authenticated")
+        val principal = authentication.principal as? OidcUser ?: throw RuntimeException("User is not an OidcUser")
+
+        return userRepository.findBySub(principal.subject)?.toDto() ?: throw UserException.NotFound("No user found")
     }
 }

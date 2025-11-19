@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable
 interface GroupService : CrudService<GroupDto> {
     fun addUser(groupId: Long, userId: Long): GroupDto
 
+    fun addUserNoMember(groupId: Long, userId: Long): GroupDto
+
     fun removeUser(groupId: Long, userId: Long): GroupDto
 
     fun getUsers(groupId: Long): List<UserDto>

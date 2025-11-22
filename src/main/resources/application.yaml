@@ -14,7 +14,7 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: http://keycloak:8080/realms/house-share
+            issuer-uri: http://192.168.1.150:8080/realms/house-share
         registration:
           house-share-server:
             provider: keycloak
@@ -24,7 +24,7 @@ spring:
               - openid
               - offline_access
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:9090/login/oauth2/code/house-share-server
+            redirect-uri: http://192.168.1.150:9090/login/oauth2/code/house-share-server
 
           house-share-app:
             provider: keycloak

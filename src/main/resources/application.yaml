@@ -1,40 +1,6 @@
 spring:
-  mvc:
-    log-request-details: true
-
   application:
     name: house-share-server
-
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-
-  security:
-    oauth2:
-      client:
-        provider:
-          keycloak:
-            issuer-uri: http://192.168.1.150:8080/realms/house-share
-        registration:
-          house-share-server:
-            provider: keycloak
-            client-id: house-share-server
-            client-secret: TfvbQdtekYanX686RgkbUhzToCefcS6Y
-            scope:
-              - openid
-              - offline_access
-            authorization-grant-type: authorization_code
-            redirect-uri: http://192.168.1.150:9090/login/oauth2/code/house-share-server
-
-          house-share-app:
-            provider: keycloak
-            client-id: house-share-app
-            client-secret: LeLeiJX2qUrdGB3DapC05zpInFEMndBR
-            scope:
-              - openid
-              - offline_access
-            authorization-grant-type: authorization_code
-            redirect-uri: app://lol.terabrendon.houseshare2/login
 
 logging:
   file:
@@ -42,11 +8,4 @@ logging:
 
 springdoc:
   swagger-ui:
-    path: "/swagger-ui.html"
-    csrf:
-      enabled: true
-
-server:
-  port: 9090
-
-debug: true
+    enabled: false

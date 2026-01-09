@@ -32,11 +32,7 @@ class OAuth2Service(
         val subject = user.subject
 
         if (!userRepository.existsBySub(subject)) {
-            // TODO: for testing
-            if (user.preferredUsername == "bre")
-                userRepository.save(user.idToken.toUserEntity().apply { id = 1 })
-            else
-                userRepository.save(user.idToken.toUserEntity())
+            userRepository.save(user.idToken.toUserEntity())
             logger.info("Registered new user from oidc. username=${user.idToken.preferredUsername}")
         }
 

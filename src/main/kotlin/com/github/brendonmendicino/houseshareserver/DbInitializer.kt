@@ -6,6 +6,7 @@ import com.github.brendonmendicino.houseshareserver.entity.ShoppingItemPriority
 import com.github.brendonmendicino.houseshareserver.service.GroupService
 import com.github.brendonmendicino.houseshareserver.service.UserService
 import org.springframework.boot.CommandLineRunner
+import org.springframework.context.annotation.Profile
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
@@ -14,6 +15,7 @@ import java.net.URI
 import java.time.OffsetDateTime
 
 @Component
+@Profile("!prod")
 class DbInitializer(
     private val userService: UserService,
     private val groupService: GroupService,

@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="HouseShareServerApplication" type="SpringBootApplicationConfigurationType"
                    factoryName="Spring Boot" nameIsGenerated="true">
+        <option name="ACTIVE_PROFILES" value="dev"/>
         <additionalParameters>
             <param>
                 <option name="enabled" value="true"/>

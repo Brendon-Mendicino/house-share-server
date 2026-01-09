@@ -19,10 +19,10 @@ services:
       - /etc/hosts:/tmp/hosts
 
   postgres:
-    image: 'postgres:18.0'
+    image: postgres:17.7
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: mydatabase
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: myuser
     ports:
       - '5432:5432'

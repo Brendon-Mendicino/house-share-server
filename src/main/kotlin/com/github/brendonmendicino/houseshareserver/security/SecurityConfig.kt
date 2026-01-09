@@ -83,7 +83,7 @@ class SecurityConfig(
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         return httpSecurity
             .authorizeHttpRequests {
-                it.requestMatchers("/login/**", "/logout/**", "/error").permitAll()
+                it.requestMatchers("/login/**", "/logout/**", "/error", ".well-known/**").permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login { loginConfigurer ->

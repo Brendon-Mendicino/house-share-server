@@ -1,6 +1,5 @@
 package com.github.brendonmendicino.houseshareserver.security
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -25,8 +24,8 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 @EnableMethodSecurity
 class SecurityConfig(
     private val crr: ClientRegistrationRepository,
-    @param:Value("\${server.port}")
-    private val port: String,
+//    @param:Value("\${server.port}")
+//    private val port: String,
     private val oidcUserService: OAuth2UserService<OidcUserRequest, OidcUser>,
 ) {
 
@@ -83,7 +82,7 @@ class SecurityConfig(
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         return httpSecurity
             .authorizeHttpRequests {
-                it.requestMatchers("/login/**", "/logout/**", "/error", ".well-known/**").permitAll()
+                it.requestMatchers("/public/**", "/login/**", "/logout/**", "/error", "/.well-known/**").permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login { loginConfigurer ->

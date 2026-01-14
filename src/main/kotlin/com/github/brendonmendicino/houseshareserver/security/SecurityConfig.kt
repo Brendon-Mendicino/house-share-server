@@ -3,6 +3,7 @@ package com.github.brendonmendicino.houseshareserver.security
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.http.HttpStatus
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -17,6 +18,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
 @Configuration
@@ -92,11 +94,9 @@ class SecurityConfig(
                         .userAuthoritiesMapper(userAuthoritiesMapper())
                 }
             }
-            .exceptionHandling {
-                // TODO: check this later
-//                it.authenticationEntryPoint { _, response, _ ->
-//                    response.sendRedirect("/oauth2/authorization/house-share-server")
-//                }
+            .exceptionHandling { exceptions ->
+                // Return 401 Unauthorized instead of 302 Redirect
+                exceptions.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             }
             .logout {
                 it

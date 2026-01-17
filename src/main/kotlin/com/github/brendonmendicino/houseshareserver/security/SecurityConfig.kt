@@ -95,13 +95,11 @@ class SecurityConfig(
                 }
             }
             .exceptionHandling { exceptions ->
-                // Return 401 Unauthorized instead of 302 Redirect
+                // Return 401 Unauthorized instead of 302 Found
                 exceptions.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             }
             .logout {
-                it
-                    .logoutSuccessUrl("/logout")
-                    .logoutSuccessHandler(oidcLogoutSuccessHandler())
+                it.logoutSuccessHandler(oidcLogoutSuccessHandler())
             }
             .csrf {
                 it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())

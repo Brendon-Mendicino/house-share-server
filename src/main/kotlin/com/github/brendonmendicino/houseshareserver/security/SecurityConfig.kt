@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher
 
 @Configuration
 @EnableWebSecurity
@@ -81,42 +83,57 @@ class SecurityConfig(
 
     @Bean
     @Profile("!no-security")
-    fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
-        return httpSecurity
-            .authorizeHttpRequests {
-                it.requestMatchers("/public/**", "/login/**", "/logout/**", "/error", "/.well-known/**").permitAll()
-                it.anyRequest().authenticated()
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http {
+            authorizeHttpRequests {
+                authorize("/", permitAll)
+                authorize("/public/**", permitAll)
+                authorize("/login/**", permitAll)
+                authorize("/logout/**", permitAll)
+                authorize("/error", permitAll)
+                authorize("/.well-known/**", permitAll)
+                authorize(anyRequest, authenticated)
             }
-            .oauth2Login { loginConfigurer ->
-                loginConfigurer.userInfoEndpoint {
-                    it
-                        .oidcUserService(oidcUserService)
-                        .userAuthoritiesMapper(userAuthoritiesMapper())
+
+            oauth2Login {
+                userInfoEndpoint {
+                    oidcUserService = this@SecurityConfig.oidcUserService
+                    userAuthoritiesMapper = userAuthoritiesMapper()
                 }
             }
-            .exceptionHandling { exceptions ->
-                // Return 401 Unauthorized instead of 302 Found
-                exceptions.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+
+            exceptionHandling {
+                defaultAuthenticationEntryPointFor(
+                    HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                    PathPatternRequestMatcher.withDefaults().matcher("/api/**")
+                )
             }
-            .logout {
-                it.logoutSuccessHandler(oidcLogoutSuccessHandler())
+
+            logout {
+                logoutUrl = "/logout"
+                logoutSuccessHandler = oidcLogoutSuccessHandler()
             }
-            .csrf {
-                it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                it.csrfTokenRequestHandler(SpaCsrfTokenRequestHandler())
+
+            csrf {
+                csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
+                csrfTokenRequestHandler = SpaCsrfTokenRequestHandler()
             }
-            .build()
+        }
+
+        return http.build()
     }
 
     @Bean
     @Profile("no-security")
-    fun noSecurityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
-        return httpSecurity
-            .authorizeHttpRequests {
-                it.anyRequest().permitAll()
+    fun noSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http {
+            authorizeHttpRequests {
+                authorize(anyRequest, permitAll)
             }
-            .csrf { it.disable() }
-            .cors { it.disable() }
-            .build()
+            csrf { disable() }
+            cors { disable() }
+        }
+
+        return http.build()
     }
 }

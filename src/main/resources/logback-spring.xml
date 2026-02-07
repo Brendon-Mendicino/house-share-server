@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+A sample xml configuration can be found at
+https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/htmlsingle/logback-spring.xml
+-->
+<configuration
+        xmlns="http://ch.qos.logback/xml/ns/logback-spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://ch.qos.logback/xml/ns/logback-spring https://raw.githubusercontent.com/borgille/logback-spring-XSD/master/src/main/xsd/logback-spring.xsd">
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <!--    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>-->
+
+    <!--  My own class for colored output. I am overriding the current `clr` for coloring.
+      `clr` is defined in defaults.xml  -->
+    <conversionRule conversionWord="clr" class="com.github.brendonmendicino.houseshareserver.util.ColorConverter"/>
+
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <!--  Example for logging into the build folder of your project  -->
+    <property name="LOG_FILE" value="logs/${springAppName}"/>
+    <!--  You can override this to have a custom pattern  -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%date){faint} | %clr(${LOG_LEVEL_PATTERN:-%5level}) | %clr(%40logger{39}:%-5line){faint} | %clr(%msg) %n%clr(${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}){red}"/>
+
+    <!--  Appender to log to console  -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--  Minimum logging level to be presented in the console logs -->
+            <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!--  Appender to log to file in a JSON format  -->
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}.jsonl</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--  Minimum logging level to be presented in the console logs -->
+            <level>INFO</level>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.jsonl.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="JSON_FILE"/>
+    </root>
+</configuration>

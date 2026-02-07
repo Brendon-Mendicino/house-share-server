@@ -2,10 +2,6 @@ spring:
   application:
     name: house-share-server
 
-logging:
-  file:
-    path: logging
-
 springdoc:
   swagger-ui:
     enabled: false

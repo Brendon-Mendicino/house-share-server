@@ -1,4 +1,8 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
+
   mvc:
     log-request-details: true
 
@@ -28,6 +32,13 @@ spring:
               - offline_access
             authorization-grant-type: authorization_code
             redirect-uri: app://lol.terabrendon.houseshare2/login
+
+logging:
+  level:
+    root: info
+    org.springframework.web: debug
+  file:
+    path: logs
 
 springdoc:
   swagger-ui:

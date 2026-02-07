@@ -1,4 +1,8 @@
 spring:
+  config:
+    activate:
+      on-profile: prod
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -30,6 +34,12 @@ spring:
               - offline_access
             authorization-grant-type: authorization_code
             redirect-uri: ${APP_REDIRECT_URI}
+
+logging:
+  level:
+    root: warn
+    com.github.brendonmendicino.houseshareserver: info
+
 
 server:
   port: ${SERVER_PORT:8080}

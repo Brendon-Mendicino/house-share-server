@@ -20,7 +20,7 @@ class DbInitializer(
     private val userService: UserService,
     private val groupService: GroupService,
 ) : CommandLineRunner {
-    override fun run(vararg args: String?) {
+    override fun run(vararg args: String) {
         val role = "ROLE_admin"
         val authorities = AuthorityUtils.createAuthorityList(role)
         val authentication = UsernamePasswordAuthenticationToken("command_line_runner", role, authorities)

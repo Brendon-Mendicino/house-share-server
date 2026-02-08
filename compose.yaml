@@ -26,3 +26,30 @@ services:
       POSTGRES_USER: myuser
     ports:
       - '5432:5432'
+
+  grafana-lgtm:
+    image: grafana/otel-lgtm:0.17.1
+    ports:
+      - '3000:3000'
+      - '4317'
+      - '4318'
+
+#  grafana:
+#    image: docker.io/grafana/grafana-oss:12.3.2
+#    ports:
+#      - '3000:3000'
+#
+#    # Resource Limits: Prevents a runaway query from crashing your host
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.75'
+#          memory: 1G
+#        reservations:
+#          memory: 256M
+#
+#    healthcheck:
+#      test: curl -f http://localhost:3000/api/health || exit 1
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3

@@ -27,7 +27,7 @@ class ColorConverter : CompositeConverter<ILoggingEvent?>() {
     }
 
     fun toAnsiString(`in`: String?, element: AnsiElement): String {
-        return AnsiOutput.toString(element, `in`)
+        return AnsiOutput.toString(element, `in` ?: "")
     }
 
     companion object {

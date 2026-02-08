@@ -42,6 +42,8 @@ class SecurityConfig(
 
     /**
      * Maps roles from the keycloak userInfo to Spring roles.
+     *
+     * Read the doc: https://docs.spring.io/spring-security/reference/reactive/oauth2/login/advanced.html#webflux-oauth2-login-advanced-map-authorities-grantedauthoritiesmapper
      */
     private fun userAuthoritiesMapper(): GrantedAuthoritiesMapper =
         GrantedAuthoritiesMapper { authorities: Collection<GrantedAuthority> ->
@@ -49,17 +51,27 @@ class SecurityConfig(
 
             authorities.forEach { authority ->
                 if (authority is OidcUserAuthority) {
+                    val idToken = authority.idToken
                     val userInfo = authority.userInfo
 
                     // Map the claims found in idToken and/or userInfo
                     // to one or more GrantedAuthority's and add it to mappedAuthorities
-                    val roles = userInfo
+                    val userRoles = userInfo
                         .claims["realm_access"]
                         ?.let { it as? Map<*, *> }
                         ?.get("roles")
                         ?.let { it as? List<*> }
-                        ?.map { SimpleGrantedAuthority("ROLE_$it") }
-                        ?: listOf()
+                        ?: listOf<Any?>()
+
+                    val idRoles = idToken
+                        .claims["realm_access"]
+                        ?.let { it as? Map<*, *> }
+                        ?.get("roles")
+                        ?.let { it as? List<*> }
+                        ?: listOf<Any?>()
+
+                    val roles = (userRoles + idRoles).distinct()
+                        .map { role -> SimpleGrantedAuthority("ROLE_$role") }
 
                     mappedAuthorities.addAll(roles)
                 } else if (authority is OAuth2UserAuthority) {

@@ -23,7 +23,10 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-house-share" ],
+    "realmRoles": [
+      "default-roles-house-share",
+      "admin"
+    ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {

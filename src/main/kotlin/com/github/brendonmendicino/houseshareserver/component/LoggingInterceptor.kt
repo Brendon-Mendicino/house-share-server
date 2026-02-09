@@ -3,13 +3,11 @@ package com.github.brendonmendicino.houseshareserver.component
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 
 
 @Component
-@Profile("dev")
 class LoggingInterceptor : HandlerInterceptor {
     companion object {
         // Logger for this class

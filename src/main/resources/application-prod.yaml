@@ -40,6 +40,20 @@ logging:
     root: warn
     com.github.brendonmendicino.houseshareserver: info
 
+management:
+  otlp:
+    metrics:
+      export:
+        url: ${METRICS_EXPORT_URL}
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${TRACING_EXPORT_URL}
+    logging:
+      export:
+        otlp:
+          endpoint: ${LOGGING_EXPORT_URL}
 
 server:
   port: ${SERVER_PORT:8080}

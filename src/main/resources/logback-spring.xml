@@ -51,8 +51,17 @@ https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/htmlsingle/log
         <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
     </appender>
 
+    <!--  Open Telemetry logger  -->
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--  Minimum logging level to be presented in the console logs -->
+            <level>INFO</level>
+        </filter>
+    </appender>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="JSON_FILE"/>
+        <appender-ref ref="OTEL"/>
     </root>
 </configuration>

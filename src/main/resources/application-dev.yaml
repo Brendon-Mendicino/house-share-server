@@ -6,6 +6,11 @@ spring:
   mvc:
     log-request-details: true
 
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
   security:
     oauth2:
       client:
@@ -37,8 +42,25 @@ logging:
   level:
     root: info
     org.springframework.web: debug
-  file:
-    path: logs
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0  # 100% sampling for development
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+        step: 10s # Sampling for development
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+    logging:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/logs
 
 springdoc:
   swagger-ui:

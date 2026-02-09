@@ -6,6 +6,7 @@ import com.github.brendonmendicino.houseshareserver.exception.UserException
 import com.github.brendonmendicino.houseshareserver.mapper.toDto
 import com.github.brendonmendicino.houseshareserver.mapper.toEntity
 import com.github.brendonmendicino.houseshareserver.repository.UserRepository
+import io.micrometer.observation.annotation.Observed
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -34,6 +35,7 @@ class UserServiceImpl(
     override fun getById(id: Long): UserDto =
         userRepository.findByIdOrNull(id)?.toDto() ?: throw UserException.NotFound.from(id)
 
+    @Observed(name = "user.create")
     @PreAuthorize("hasRole('admin')")
     override fun save(dto: UserDto): UserDto =
         userRepository.save(dto.toEntity()).toDto().also {

@@ -44,6 +44,9 @@ logging:
     org.springframework.web: debug
 
 management:
+  observations:
+    annotations:
+      enabled: true
   tracing:
     sampling:
       probability: 1.0  # 100% sampling for development

@@ -41,6 +41,9 @@ logging:
     com.github.brendonmendicino.houseshareserver: info
 
 management:
+  observations:
+    annotations:
+      enabled: true
   otlp:
     metrics:
       export:

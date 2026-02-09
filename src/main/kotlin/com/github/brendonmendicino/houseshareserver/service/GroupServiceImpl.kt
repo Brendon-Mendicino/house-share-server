@@ -11,6 +11,7 @@ import com.github.brendonmendicino.houseshareserver.repository.ExpenseRepository
 import com.github.brendonmendicino.houseshareserver.repository.GroupRepository
 import com.github.brendonmendicino.houseshareserver.repository.ShoppingItemRepository
 import com.github.brendonmendicino.houseshareserver.repository.UserRepository
+import io.micrometer.observation.annotation.Observed
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -161,6 +162,7 @@ class GroupServiceImpl(
     override fun getById(id: Long): GroupDto =
         groupRepository.findByIdOrNull(id)?.toDto() ?: throw GroupException.NotFound.from(id)
 
+    @Observed(name = "group.create")
     override fun save(dto: GroupDto): GroupDto =
         groupRepository.save(createGroup(dto)).toDto()
             .also { logger.info("Created Group@${it.id}") }
@@ -223,6 +225,7 @@ class GroupServiceImpl(
         return groupRepository.findUserById(groupId, userId)?.toDto() ?: throw UserException.NotFound.from(userId)
     }
 
+    @Observed(name = "group.item.create")
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun addShoppingItem(groupId: Long, item: ShoppingItemDto): ShoppingItemDto =
         shoppingItemRepository.save(createShoppingItem(groupId, item)).toDto()
@@ -276,6 +279,7 @@ class GroupServiceImpl(
             .also { logger.info("Unchecked ShoppingItem@$shoppingItemId") }
     }
 
+    @Observed(name = "group.expense.create")
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun addExpense(
         groupId: Long,

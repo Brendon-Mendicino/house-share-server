@@ -57,6 +57,8 @@ https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/htmlsingle/log
             <!--  Minimum logging level to be presented in the console logs -->
             <level>INFO</level>
         </filter>
+
+        <captureMdcAttributes>*</captureMdcAttributes>
     </appender>
 
     <root level="INFO">

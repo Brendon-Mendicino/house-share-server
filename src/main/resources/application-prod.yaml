@@ -35,6 +35,10 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: ${APP_REDIRECT_URI}
 
+service:
+  paddle:
+    url: ${PADDLE_URL}
+
 logging:
   level:
     root: warn

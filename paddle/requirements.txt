@@ -1,0 +1,6 @@
+paddleocr==3.2.0
+paddlepaddle==3.2.0
+fastapi==0.129.0
+uvicorn[standard]
+python-multipart
+numpy

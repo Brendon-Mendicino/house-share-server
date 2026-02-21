@@ -11,12 +11,17 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
+
   security:
     oauth2:
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8080/realms/house-share
+            issuer-uri: http://192.168.1.150:8080/realms/house-share
         registration:
           house-share-server:
             provider: keycloak
@@ -26,7 +31,7 @@ spring:
               - openid
               - offline_access
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:${server.port}/login/oauth2/code/house-share-server
+            redirect-uri: http://192.168.1.150:${server.port}/login/oauth2/code/house-share-server
 
           house-share-app:
             provider: keycloak
@@ -38,10 +43,15 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: app://lol.terabrendon.houseshare2/login
 
+service:
+  paddle:
+    url: http://localhost:8000
+
 logging:
   level:
     root: info
     org.springframework.web: debug
+    org.springframework.security: debug
 
 management:
   observations:

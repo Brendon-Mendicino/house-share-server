@@ -10,11 +10,10 @@ import org.springframework.context.annotation.Profile
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.OffsetDateTime
 
-@Component
+//@Component
 @Profile("!prod")
 class DbInitializer(
     private val userService: UserService,

@@ -9,18 +9,17 @@ from paddleocr import PaddleOCR
 app = FastAPI()
 
 # TODO: externalize the configuration
-ocr = PaddleOCR(
-    use_doc_orientation_classify=True, use_doc_unwarping=True
-)  # text image preprocessing + text detection + textline orientation classification + text recognition
-
-
 # ocr = PaddleOCR(
-#     text_detection_model_name="PP-OCRv5_mobile_det",
-#     text_recognition_model_name="PP-OCRv5_mobile_rec",
-#     use_doc_orientation_classify=False,
-#     use_doc_unwarping=False,
-#     use_textline_orientation=False,
-# )
+#     use_doc_orientation_classify=True, use_doc_unwarping=True
+# )  # text image preprocessing + text detection + textline orientation classification + text recognition
+
+
+ocr = PaddleOCR(
+    text_detection_model_name="PP-OCRv5_mobile_det",
+    text_recognition_model_name="PP-OCRv5_mobile_rec",
+    use_doc_orientation_classify=True,
+    use_doc_unwarping=True,
+)
 
 
 def process_json(json: dict) -> list[dict]:
@@ -67,7 +66,7 @@ async def run_ocr(file: UploadFile = File(...)):
     if file.content_type not in ["image/jpeg", "image/jpg", "image/png"]:
         raise HTTPException(
             status_code=400,
-            detail=f"FIle Content-Type not supported: {file.content_type=}",
+            detail=f"File Content-Type not supported: {file.content_type=}",
         )
 
     contents = await file.read()

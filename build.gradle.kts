@@ -8,6 +8,8 @@ plugins {
     id("idea")
 }
 
+val springAiVersion by extra("2.0.0-M2")
+
 group = "com.github.brendonmendicino"
 version = "0.0.1-SNAPSHOT"
 description = "house-share-server"
@@ -36,6 +38,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.ai:spring-ai-starter-model-ollama")
     implementation("org.springframework.boot:spring-boot-restclient")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
@@ -86,6 +89,11 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+    }
+}
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:$springAiVersion")
     }
 }
 

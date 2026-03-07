@@ -26,3 +26,14 @@ services:
       - '3000:3000'
       - '4317'
       - '4318'
+
+  ollama:
+    image: ollama/ollama:0.17.7
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+
+volumes:
+  ollama:
+    external: true

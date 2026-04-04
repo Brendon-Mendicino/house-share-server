@@ -42,10 +42,10 @@ class DbInitializer(
         userService.save(UserDto(0, "andrea", null, null, null, null))
         userService.save(UserDto(0, "peppe", null, null, null, null))
 
-        groupService.save(GroupDto(0, "Belli", "ma io che ne so", listOf(1, 2, 3, 4, 5)))
-        groupService.save(GroupDto(0, "Brutti", "mah", listOf(1, 2, 3)))
-        groupService.save(GroupDto(0, "Cicci", "sisi", listOf(1, 3)))
-        groupService.save(GroupDto(0, "NOOOOO", "tung tung", listOf(2, 3, 4, 5)))
+        groupService.save(GroupDto(0, "Belli", "ma io che ne so", listOf(1, 2, 3, 4, 5), null))
+        groupService.save(GroupDto(0, "Brutti", "mah", listOf(1, 2, 3), null))
+        groupService.save(GroupDto(0, "Cicci", "sisi", listOf(1, 3), null))
+        groupService.save(GroupDto(0, "NOOOOO", "tung tung", listOf(2, 3, 4, 5), null))
 
         groupService.addShoppingItem(
             1, ShoppingItemDto(

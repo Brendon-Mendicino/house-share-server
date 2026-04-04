@@ -26,6 +26,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Profile("!no-security")
 class SecurityConfig(
     private val crr: ClientRegistrationRepository,
 //    @param:Value("\${server.port}")
@@ -94,7 +95,6 @@ class SecurityConfig(
         }
 
     @Bean
-    @Profile("!no-security")
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http {
             authorizeHttpRequests {

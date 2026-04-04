@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 @Controller
 @RequestMapping("/public")
 class PublicController(
-    @param:Value("\${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
+    @param:Value($$"${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
     private val issuerUri: String,
 ) {
     @GetMapping("/account")

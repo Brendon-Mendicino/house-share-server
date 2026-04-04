@@ -8,4 +8,5 @@ fun AppGroup.toDto() = GroupDto(
     name = name,
     description = description,
     userIds = users.map { it.id },
+    imageUrl = imageUrl?.toString(),
 )

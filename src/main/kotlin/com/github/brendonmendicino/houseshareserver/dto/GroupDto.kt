@@ -3,6 +3,7 @@ package com.github.brendonmendicino.houseshareserver.dto
 import com.github.brendonmendicino.houseshareserver.validator.NotBlankIfPresent
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.hibernate.validator.constraints.URL
 
 data class GroupDto(
     val id: Long,
@@ -14,4 +15,6 @@ data class GroupDto(
     val description: String?,
     @field:Size(min = 1)
     val userIds: List<Long>,
+    @field:URL
+    val imageUrl: String?,
 )

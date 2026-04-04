@@ -1,11 +1,14 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
 import jakarta.persistence.*
+import java.net.URI
 
 @Entity
 class AppGroup(
     var name: String,
     var description: String?,
+    @Column(columnDefinition = "TEXT")
+    var imageUrl: URI?,
 ) : BaseEntity() {
     @Embedded
     lateinit var audit: Auditable

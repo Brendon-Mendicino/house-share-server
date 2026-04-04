@@ -23,6 +23,7 @@ class AppUser(
     @Column(unique = true)
     var sub: String?,
 
+    @Column(columnDefinition = "TEXT")
     var picture: URI?,
 ) : BaseEntity() {
     @CreationTimestamp

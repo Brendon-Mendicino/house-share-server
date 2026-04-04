@@ -19,6 +19,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.net.URI
 
 @Service
 @Transactional
@@ -54,6 +55,7 @@ class GroupServiceImpl(
         val entity = AppGroup(
             name = dto.name,
             description = dto.description,
+            imageUrl = dto.imageUrl?.let { URI(it) },
         )
 
         dto

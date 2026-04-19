@@ -6,6 +6,11 @@ spring:
   mvc:
     log-request-details: true
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydatabase
+    username: myuser
+    password: secret
+
   jpa:
     properties:
       hibernate:

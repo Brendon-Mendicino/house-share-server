@@ -48,7 +48,6 @@ class AppUser(
     var userExpenseParts: MutableSet<ExpensePart> = mutableSetOf()
 
 
-
     fun addShoppingItem(item: ShoppingItem) {
         shoppingItems.add(item)
         item.owner = this

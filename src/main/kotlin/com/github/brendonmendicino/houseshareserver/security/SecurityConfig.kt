@@ -98,13 +98,20 @@ class SecurityConfig(
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http {
             authorizeHttpRequests {
+                // Authenticated
+                authorize("/api/**", authenticated)
+                authorize("/csrf", authenticated)
+
+                // Public
                 authorize("/", permitAll)
                 authorize("/public/**", permitAll)
                 authorize("/login/**", permitAll)
                 authorize("/logout/**", permitAll)
                 authorize("/error", permitAll)
                 authorize("/.well-known/**", permitAll)
-                authorize(anyRequest, authenticated)
+
+                // Admin
+                authorize(anyRequest, hasRole("admin"))
             }
 
             oauth2Login {

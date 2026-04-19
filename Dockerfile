@@ -4,7 +4,12 @@ COPY . .
 RUN gradle bootJar --no-daemon
 
 FROM eclipse-temurin:24-jre-noble
-RUN groupadd --system house && useradd --system house -g house
+
+RUN groupadd --system house \
+    && useradd --system house -g house \
+    && mkdir -p /app \
+    && chown -R house:house /app
+
 USER house:house
 WORKDIR /app
 COPY --from=builder /home/gradle/project/build/libs/*.jar app.jar

@@ -65,12 +65,12 @@ management:
       export:
         otlp:
           endpoint: http://localhost:4318/v1/traces
-          transport: grpc
+          transport: http
     logging:
       export:
         otlp:
           endpoint: http://localhost:4318/v1/logs
-          transport: grpc
+          transport: http
 
 springdoc:
   swagger-ui:

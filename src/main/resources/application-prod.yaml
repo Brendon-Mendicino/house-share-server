@@ -53,12 +53,12 @@ management:
       export:
         otlp:
           endpoint: ${TRACING_EXPORT_URL}
-          transport: grpc
+          transport: http
     logging:
       export:
         otlp:
           endpoint: ${LOGGING_EXPORT_URL}
-          transport: grpc
+          transport: http
 
 server:
   port: ${SERVER_PORT:8080}

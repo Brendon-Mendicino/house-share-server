@@ -134,9 +134,14 @@ class SecurityConfig(
 
         return http.build()
     }
+}
 
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@Profile("no-security")
+class NoSecurityConfig {
     @Bean
-    @Profile("no-security")
     fun noSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http {
             authorizeHttpRequests {

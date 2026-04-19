@@ -4,4 +4,23 @@ spring:
       on-profile: test
 
   flyway:
-    enabled: false
+    clean-disabled: false
+
+  mvc:
+    log-request-details: true
+
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+    hibernate:
+      ddl-auto: none
+
+logging:
+  level:
+    root: info
+    org.springframework.web: debug
+
+debug: true

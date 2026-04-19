@@ -15,7 +15,7 @@ import java.net.URI
 import java.time.OffsetDateTime
 
 @Component
-@Profile("!prod")
+@Profile("dev")
 class DbInitializer(
     private val userService: UserService,
     private val groupService: GroupService,

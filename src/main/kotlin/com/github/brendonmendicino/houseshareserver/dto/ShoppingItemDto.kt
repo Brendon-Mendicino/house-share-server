@@ -11,14 +11,18 @@ data class ShoppingItemDto(
     val id: Long,
     val ownerId: Long,
     val groupId: Long,
+
     @field:NotBlank
     @field:Size(max = 250)
     val name: String,
+
     val amount: Int,
+
     @field:Min(1)
     val price: Long?,
-    val priority: ShoppingItemPriority,
+    val priority: ShoppingItemPriority?,
     val createdAt: OffsetDateTime,
+
     @field:Valid
     val check: CheckDto?,
 )

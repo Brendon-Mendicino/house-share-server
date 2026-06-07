@@ -1,6 +1,8 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotEmpty
 import org.hibernate.annotations.CreationTimestamp
 import java.net.URI
 import java.time.OffsetDateTime
@@ -12,9 +14,18 @@ import java.time.OffsetDateTime
     ]
 )
 class AppUser(
+    @NotEmpty
+    @Column(nullable = false)
     var username: String,
+
+    @Email
+    @NotEmpty
     var email: String?,
+
+    @NotEmpty
     var firstName: String?,
+
+    @NotEmpty
     var lastName: String?,
     /**
      * OAuth2 User ID. Specify if this user was created using
@@ -29,37 +40,9 @@ class AppUser(
     @CreationTimestamp
     lateinit var createdAt: OffsetDateTime
 
-    @ManyToMany(mappedBy = "users", cascade = [CascadeType.MERGE])
+    @ManyToMany(cascade = [CascadeType.MERGE])
     var groups: MutableSet<AppGroup> = mutableSetOf()
 
-    @OneToMany(mappedBy = "owner", cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-    var shoppingItems: MutableSet<ShoppingItem> = mutableSetOf()
-
-    @OneToMany(mappedBy = "checkingUser")
-    var checkedShoppingItems: MutableSet<ShoppingItem> = mutableSetOf()
-
-    @OneToMany(mappedBy = "owner", cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-    var ownedExpenses: MutableSet<Expense> = mutableSetOf()
-
-    @OneToMany(mappedBy = "payer", cascade = [CascadeType.MERGE])
-    var payedExpenses: MutableSet<Expense> = mutableSetOf()
-
-    @OneToMany(mappedBy = "userPart")
-    var userExpenseParts: MutableSet<ExpensePart> = mutableSetOf()
-
-
-    fun addShoppingItem(item: ShoppingItem) {
-        shoppingItems.add(item)
-        item.owner = this
-    }
-
-    fun addOwnedExpense(expense: Expense) {
-        ownedExpenses.add(expense)
-        expense.owner = this
-    }
-
-    fun addPayedExpense(expense: Expense) {
-        payedExpenses.add(expense)
-        expense.payer = this
-    }
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.MERGE])
+    var members: MutableList<GroupMember> = mutableListOf()
 }

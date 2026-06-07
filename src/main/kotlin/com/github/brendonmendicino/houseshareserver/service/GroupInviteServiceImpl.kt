@@ -1,6 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.service
 
-import com.github.brendonmendicino.houseshareserver.dto.GroupDto
+import com.github.brendonmendicino.houseshareserver.dto.AppGroupDto
 import com.github.brendonmendicino.houseshareserver.dto.InviteUrlDto
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
@@ -33,7 +33,7 @@ class GroupInviteServiceImpl(
     }
 
     @PreAuthorize("@signedUrlService.validCurrentUri()")
-    override fun joinFromInviteUrl(groupId: Long): GroupDto {
+    override fun joinFromInviteUrl(groupId: Long): AppGroupDto {
         val loggedUser = userService.loggedUser()
 
         return groupService.addUserNoMember(groupId, loggedUser.id).also {

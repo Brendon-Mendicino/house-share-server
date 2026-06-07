@@ -20,6 +20,6 @@ fun Expense.toDto() = ExpenseDto(
 fun ExpensePart.toDto() = ExpensePartDto(
     id = id,
     expenseId = partOf.id,
-    userId = userPart.id,
+    memberId = memberPart.id,
     partAmount = partAmount,
 )

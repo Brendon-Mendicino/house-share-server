@@ -9,7 +9,7 @@ import java.time.OffsetDateTime
 
 data class ExpenseDto(
     val id: Long,
-    val category: ExpenseCategory,
+    val category: ExpenseCategory?,
     @field:NotBlank
     @field:Size(max = 250)
     val title: String,

@@ -31,4 +31,6 @@ open class BaseEntity(
         return if (0L == id) false
         else this.id == other.id
     }
+
+    fun ref(): String = "${this::class.simpleName}@$id"
 }

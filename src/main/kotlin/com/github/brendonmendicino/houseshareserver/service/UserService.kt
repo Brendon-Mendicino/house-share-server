@@ -1,10 +1,10 @@
 package com.github.brendonmendicino.houseshareserver.service
 
-import com.github.brendonmendicino.houseshareserver.dto.GroupDto
-import com.github.brendonmendicino.houseshareserver.dto.UserDto
+import com.github.brendonmendicino.houseshareserver.dto.AppGroupDto
+import com.github.brendonmendicino.houseshareserver.dto.AppUserDto
 
-interface UserService : CrudService<UserDto> {
-    fun findGroups(userId: Long): List<GroupDto>
+interface UserService : CrudService<AppUserDto> {
+    fun findGroups(userId: Long): List<AppGroupDto>
 
-    fun loggedUser(): UserDto
+    fun loggedUser(): AppUserDto
 }

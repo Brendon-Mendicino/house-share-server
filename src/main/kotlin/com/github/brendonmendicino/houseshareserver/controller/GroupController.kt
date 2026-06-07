@@ -1,9 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.controller
 
-import com.github.brendonmendicino.houseshareserver.dto.CheckDto
-import com.github.brendonmendicino.houseshareserver.dto.ExpenseDto
-import com.github.brendonmendicino.houseshareserver.dto.GroupDto
-import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
+import com.github.brendonmendicino.houseshareserver.dto.*
 import com.github.brendonmendicino.houseshareserver.service.GroupInviteService
 import com.github.brendonmendicino.houseshareserver.service.GroupService
 import jakarta.validation.Valid
@@ -15,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 class GroupController(
     private val groupService: GroupService,
     private val groupInviteService: GroupInviteService,
-) : CrudController<GroupDto>(groupService) {
+) : CrudController<AppGroupDto>(groupService) {
     @PostMapping("/{groupId}/invite")
     fun inviteUrl(@PathVariable groupId: Long) = groupInviteService.createInviteUrl(groupId)
 
@@ -25,7 +22,7 @@ class GroupController(
         @RequestParam expires: Long,
         @RequestParam nonce: String,
         @RequestParam signature: String
-    ): GroupDto =
+    ): AppGroupDto =
         groupInviteService.joinFromInviteUrl(groupId)
 
     @PutMapping("/{groupId}/users/{userId}")
@@ -39,6 +36,13 @@ class GroupController(
 
     @GetMapping("/{groupId}/users/{userId}")
     fun getUserById(@PathVariable groupId: Long, @PathVariable userId: Long) = groupService.getUserById(groupId, userId)
+
+    @PostMapping("/{groupId}/members")
+    fun addMember(@PathVariable groupId: Long, @Valid member: GroupMemberDto) = groupService.addMember(groupId, member)
+
+    @PutMapping("/{groupId}/members/{memberId}")
+    fun updateMember(@PathVariable groupId: Long, @PathVariable memberId: Long, @Valid member: GroupMemberDto) =
+        groupService.updateMember(groupId, memberId, member)
 
     @PostMapping("/{groupId}/shopping-items")
     fun addShoppingItem(@PathVariable groupId: Long, @Valid @RequestBody item: ShoppingItemDto) =

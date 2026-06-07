@@ -1,9 +1,9 @@
 package com.github.brendonmendicino.houseshareserver.mapper
 
-import com.github.brendonmendicino.houseshareserver.dto.UserDto
+import com.github.brendonmendicino.houseshareserver.dto.AppUserDto
 import com.github.brendonmendicino.houseshareserver.entity.AppUser
 
-fun UserDto.toEntity() = AppUser(
+fun AppUserDto.toEntity() = AppUser(
     username = username,
     firstName = firstName,
     lastName = lastName,
@@ -12,7 +12,7 @@ fun UserDto.toEntity() = AppUser(
     picture = picture,
 )
 
-fun AppUser.toDto() = UserDto(
+fun AppUser.toDto() = AppUserDto(
     id = id,
     username = username,
     lastName = lastName,

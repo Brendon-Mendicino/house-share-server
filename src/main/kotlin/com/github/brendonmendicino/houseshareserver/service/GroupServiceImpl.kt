@@ -2,15 +2,9 @@ package com.github.brendonmendicino.houseshareserver.service
 
 import com.github.brendonmendicino.houseshareserver.dto.*
 import com.github.brendonmendicino.houseshareserver.entity.*
-import com.github.brendonmendicino.houseshareserver.exception.ExpenseException
-import com.github.brendonmendicino.houseshareserver.exception.GroupException
-import com.github.brendonmendicino.houseshareserver.exception.ShoppingItemException
-import com.github.brendonmendicino.houseshareserver.exception.UserException
+import com.github.brendonmendicino.houseshareserver.exception.*
 import com.github.brendonmendicino.houseshareserver.mapper.toDto
-import com.github.brendonmendicino.houseshareserver.repository.ExpenseRepository
-import com.github.brendonmendicino.houseshareserver.repository.GroupRepository
-import com.github.brendonmendicino.houseshareserver.repository.ShoppingItemRepository
-import com.github.brendonmendicino.houseshareserver.repository.UserRepository
+import com.github.brendonmendicino.houseshareserver.repository.*
 import io.micrometer.observation.annotation.Observed
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
@@ -28,30 +22,30 @@ class GroupServiceImpl(
     private val shoppingItemRepository: ShoppingItemRepository,
     private val expenseRepository: ExpenseRepository,
     private val userRepository: UserRepository,
+    private val groupMemberRepository: GroupMemberRepository,
 ) : GroupService {
     companion object {
         private val logger = LoggerFactory.getLogger(GroupServiceImpl::class.java)
     }
 
-    private fun checkUserInGroup(groupId: Long, userId: Long) {
-        if (!groupRepository.existsUserById(groupId, userId))
-            throw GroupException.NotMember.from(groupId, userId)
+    private fun getUser(userId: Long): AppUser {
+        return userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
     }
 
-    private fun checkUsersInGroup(groupId: Long, userIds: List<Long>) {
-        for (userId in userIds) {
-            checkUserInGroup(groupId, userId)
-        }
+    private fun getUserInGroup(groupId: Long, userId: Long): AppUser {
+        return userRepository.findByIdAndGroups_Id(userId, groupId)
+            ?: throw UserException.NotFound.from(userId)
     }
 
-    private fun getGroupUser(groupId: Long, userId: Long): AppUser {
-        return groupRepository.findUserById(groupId, userId) ?: throw UserException.NotFound.from(userId)
+    private fun getMemberInGroup(groupId: Long, memberId: Long): GroupMember {
+        return groupMemberRepository.findByIdAndGroupId(memberId, groupId)
+            ?: throw GroupMemberException.NotFound.from(memberId)
     }
 
     /**
      * Creates a [AppGroup] with its users.
      */
-    private fun createGroup(dto: GroupDto): AppGroup {
+    private fun createGroup(dto: AppGroupDto): AppGroup {
         val entity = AppGroup(
             name = dto.name,
             description = dto.description,
@@ -60,10 +54,26 @@ class GroupServiceImpl(
 
         dto
             .userIds
-            .map { userRepository.findByIdOrNull(it) ?: throw UserException.NotFound.from(it) }
+            .map { getUser(it) }
             .forEach { entity.addUser(it) }
 
         return entity
+    }
+
+    internal fun createMember(groupId: Long, memberDto: GroupMemberDto): GroupMember {
+        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
+        val user = if (memberDto.userId != null) {
+            getUserInGroup(groupId, memberDto.userId)
+        } else {
+            null
+        }
+
+        val member = GroupMember(memberDto.username, memberDto.picture?.let { URI(it) }, group, user)
+        user?.members?.add(member)
+
+        group.addMember(member)
+
+        return member
     }
 
     /**
@@ -71,10 +81,7 @@ class GroupServiceImpl(
      */
     private fun createShoppingItem(groupId: Long, itemDto: ShoppingItemDto): ShoppingItem {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
-        val owner =
-            groupRepository.findUserById(groupId, itemDto.ownerId) ?: throw UserException.NotFound.from(itemDto.ownerId)
-
-        checkUserInGroup(groupId, owner.id)
+        val owner = getMemberInGroup(groupId, itemDto.ownerId)
 
         val item = ShoppingItem(
             owner = owner,
@@ -84,7 +91,7 @@ class GroupServiceImpl(
             price = itemDto.price,
             priority = itemDto.priority,
             // TODO: decide if I want to keep the data from the dto (probably yes?)
-            checkingUser = null,
+            checkingMember = null,
             checkoffTimestamp = null,
         )
 
@@ -98,16 +105,12 @@ class GroupServiceImpl(
      * Creates and attaches a [ExpensePart] to an [Expense].
      */
     internal fun createExpensePart(expensePartDto: ExpensePartDto, expense: Expense): ExpensePart {
-        val userPart = userRepository.findByIdOrNull(expensePartDto.userId) ?: throw UserException.NotFound.from(
-            expensePartDto.userId
-        )
-
-        checkUserInGroup(expense.group.id, userPart.id)
+        val memberPart = getMemberInGroup(expense.group.id, expensePartDto.memberId)
 
         val expensePart = ExpensePart(
             partAmount = expensePartDto.partAmount,
             partOf = expense,
-            userPart = userPart,
+            memberPart = memberPart,
         )
 
         expense.addExpensePart(expensePart)
@@ -120,18 +123,12 @@ class GroupServiceImpl(
      */
     internal fun createExpense(groupId: Long, expenseDto: ExpenseDto): Expense {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
-        val owner = groupRepository.findUserById(groupId, expenseDto.ownerId) ?: throw UserException.NotFound.from(
-            expenseDto.ownerId
-        )
-        val payer = groupRepository.findUserById(groupId, expenseDto.payerId) ?: throw UserException.NotFound.from(
-            expenseDto.payerId
-        )
+        val owner = getMemberInGroup(groupId, expenseDto.ownerId)
+        val payer = getMemberInGroup(groupId, expenseDto.payerId)
 
-        checkUsersInGroup(groupId, listOf(owner.id, payer.id))
-
-        // Check that there are no users duplicated
+        // Check that there are no members duplicated
         val duplicate =
-            expenseDto.expenseParts.groupingBy { it.userId }.eachCount().entries.firstOrNull { it.value != 1 }
+            expenseDto.expenseParts.groupingBy { it.memberId }.eachCount().entries.firstOrNull { it.value != 1 }
         if (duplicate != null)
             throw UserException.DuplicateId.from(duplicate.key)
 
@@ -157,23 +154,23 @@ class GroupServiceImpl(
     }
 
     @PreAuthorize("hasRole('admin')")
-    override fun getAll(pageable: Pageable): Page<GroupDto> =
+    override fun getAll(pageable: Pageable): Page<AppGroupDto> =
         groupRepository.findAll(pageable).map { it.toDto() }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#id)")
-    override fun getById(id: Long): GroupDto =
+    override fun getById(id: Long): AppGroupDto =
         groupRepository.findByIdOrNull(id)?.toDto() ?: throw GroupException.NotFound.from(id)
 
     @Observed(name = "group.create")
-    override fun save(dto: GroupDto): GroupDto =
+    override fun save(dto: AppGroupDto): AppGroupDto =
         groupRepository.save(createGroup(dto)).toDto()
             .also { logger.info("Created Group@${it.id}") }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#id)")
     override fun update(
         id: Long,
-        dto: GroupDto
-    ): GroupDto {
+        dto: AppGroupDto
+    ): AppGroupDto {
         val group = createGroup(dto)
         // Create new entity if it does not exist
         group.id = if (groupRepository.existsById(id)) id else 0
@@ -188,7 +185,7 @@ class GroupServiceImpl(
         logger.info("Deleted Group@${id}")
     }
 
-    internal fun addUserInternal(groupId: Long, userId: Long): GroupDto {
+    internal fun addUserInternal(groupId: Long, userId: Long): AppGroupDto {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
         val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
 
@@ -202,29 +199,51 @@ class GroupServiceImpl(
     override fun addUser(
         groupId: Long,
         userId: Long
-    ): GroupDto = addUserInternal(groupId, userId)
+    ): AppGroupDto = addUserInternal(groupId, userId)
 
-    override fun addUserNoMember(groupId: Long, userId: Long): GroupDto = addUserInternal(groupId, userId)
+    /**
+     * Same as [addUser], but without the authorization checks.
+     */
+    override fun addUserNoMember(groupId: Long, userId: Long): AppGroupDto = addUserInternal(groupId, userId)
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
-    override fun removeUser(groupId: Long, userId: Long): GroupDto {
+    override fun removeUser(groupId: Long, userId: Long): AppGroupDto {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
+        val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
 
-        group.removeUser(userId)
+        group.removeUser(user)
 
         return groupRepository.save(group).toDto()
             .also { logger.info("Removed User@$userId from Group@$groupId") }
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
-    override fun getUsers(groupId: Long): List<UserDto> {
+    override fun getUsers(groupId: Long): List<AppUserDto> {
         val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
         return group.users.map { it.toDto() }
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
-    override fun getUserById(groupId: Long, userId: Long): UserDto {
+    override fun getUserById(groupId: Long, userId: Long): AppUserDto {
         return groupRepository.findUserById(groupId, userId)?.toDto() ?: throw UserException.NotFound.from(userId)
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun addMember(groupId: Long, member: GroupMemberDto): GroupMemberDto {
+        return groupMemberRepository.save(createMember(groupId, member))
+            .also { logger.info("Added {} to {}", it.ref(), it.group.ref()) }
+            .toDto()
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun updateMember(groupId: Long, memberId: Long, member: GroupMemberDto): GroupMemberDto {
+        val member = createMember(groupId, member)
+
+        member.id = memberId
+
+        return groupMemberRepository.save(member)
+            .also { logger.info("Updated {} of {}", it.ref(), it.group.ref()) }
+            .toDto()
     }
 
     @Observed(name = "group.item.create")
@@ -260,16 +279,13 @@ class GroupServiceImpl(
         val shoppingItem = shoppingItemRepository.findByIdAndGroupId(shoppingItemId, groupId)
             ?: throw ShoppingItemException.NotFound.from(shoppingItemId)
 
-        val user =
-            userRepository.findByIdOrNull(dto.checkingUserId) ?: throw UserException.NotFound.from(dto.checkingUserId)
+        val member = getMemberInGroup(groupId, dto.checkingMemberId)
 
-        checkUserInGroup(groupId, user.id)
-
-        shoppingItem.check(user, dto.checkoffTimestamp)
+        shoppingItem.check(member, dto.checkoffTimestamp)
 
         return shoppingItemRepository.save(shoppingItem)
-            .let { CheckDto(it.checkingUser!!.id, it.checkoffTimestamp!!) }
-            .also { logger.info("Checked ShoppingItem@$shoppingItemId") }
+            .also { logger.info("Checked {}", it.ref()) }
+            .let { CheckDto(it.checkingMember!!.id, it.checkoffTimestamp!!) }
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
@@ -303,8 +319,8 @@ class GroupServiceImpl(
         entity.category = dto.category
         entity.title = dto.title
         entity.description = dto.description
-        entity.owner = getGroupUser(groupId, dto.ownerId)
-        entity.payer = getGroupUser(groupId, dto.payerId)
+        entity.owner = getMemberInGroup(groupId, dto.ownerId)
+        entity.payer = getMemberInGroup(groupId, dto.payerId)
 
         entity.expenseParts.clear()
         for (part in dto.expenseParts) {

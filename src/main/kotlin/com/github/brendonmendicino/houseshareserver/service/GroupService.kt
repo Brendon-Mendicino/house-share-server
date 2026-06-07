@@ -4,16 +4,20 @@ import com.github.brendonmendicino.houseshareserver.dto.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
-interface GroupService : CrudService<GroupDto> {
-    fun addUser(groupId: Long, userId: Long): GroupDto
+interface GroupService : CrudService<AppGroupDto> {
+    fun addUser(groupId: Long, userId: Long): AppGroupDto
 
-    fun addUserNoMember(groupId: Long, userId: Long): GroupDto
+    fun addUserNoMember(groupId: Long, userId: Long): AppGroupDto
 
-    fun removeUser(groupId: Long, userId: Long): GroupDto
+    fun removeUser(groupId: Long, userId: Long): AppGroupDto
 
-    fun getUsers(groupId: Long): List<UserDto>
+    fun getUsers(groupId: Long): List<AppUserDto>
 
-    fun getUserById(groupId: Long, userId: Long): UserDto
+    fun getUserById(groupId: Long, userId: Long): AppUserDto
+
+    fun addMember(groupId: Long, member: GroupMemberDto): GroupMemberDto
+
+    fun updateMember(groupId: Long, memberId: Long, member: GroupMemberDto): GroupMemberDto
 
     fun addShoppingItem(groupId: Long, item: ShoppingItemDto): ShoppingItemDto
 

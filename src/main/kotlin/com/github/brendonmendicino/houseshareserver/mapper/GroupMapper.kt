@@ -1,9 +1,9 @@
 package com.github.brendonmendicino.houseshareserver.mapper
 
-import com.github.brendonmendicino.houseshareserver.dto.GroupDto
+import com.github.brendonmendicino.houseshareserver.dto.AppGroupDto
 import com.github.brendonmendicino.houseshareserver.entity.AppGroup
 
-fun AppGroup.toDto() = GroupDto(
+fun AppGroup.toDto() = AppGroupDto(
     id = id,
     name = name,
     description = description,

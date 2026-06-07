@@ -17,5 +17,5 @@ class ExpensePart(
     var partOf: Expense,
 
     @ManyToOne
-    var userPart: AppUser,
+    var memberPart: GroupMember,
 ) : BaseEntity()

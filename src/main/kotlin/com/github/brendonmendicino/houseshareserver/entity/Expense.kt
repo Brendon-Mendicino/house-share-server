@@ -1,17 +1,27 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.NotEmpty
 
 @Entity
 class Expense(
-    var category: ExpenseCategory,
+    var category: ExpenseCategory?,
+
+    @NotEmpty
+    @Column(nullable = false)
     var title: String,
+
+    @Column(length = 5000)
     var description: String?,
 
-    @ManyToOne
-    var owner: AppUser,
-    @ManyToOne
-    var payer: AppUser,
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    var owner: GroupMember,
+
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    var payer: GroupMember,
+
     @ManyToOne
     @JoinColumn(updatable = false)
     var group: AppGroup,
@@ -48,6 +58,7 @@ class Expense(
     }
 }
 
+// TODO: shall i put this inside the class??
 @Suppress("unused")
 enum class ExpenseCategory {
     Car,

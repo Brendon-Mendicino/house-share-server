@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min
 data class ExpensePartDto(
     val id: Long,
     val expenseId: Long,
-    val userId: Long,
+    val memberId: Long,
     @field:Min(1)
     val partAmount: Long,
 )

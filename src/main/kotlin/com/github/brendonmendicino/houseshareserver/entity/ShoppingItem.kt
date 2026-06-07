@@ -1,30 +1,37 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
 import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
-import jakarta.persistence.Embedded
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.PositiveOrZero
 import java.time.OffsetDateTime
 
 @Entity
 class ShoppingItem(
+    @NotEmpty
+    @Column(nullable = false)
     var name: String,
     var amount: Int,
     /**
      * Represent the money compact representation.
      * Where 1 euro == 100 price.
      */
+    @PositiveOrZero
     var price: Long?,
-    var priority: ShoppingItemPriority,
+
+    var priority: ShoppingItemPriority?,
 
     var checkoffTimestamp: OffsetDateTime?,
+
     @ManyToOne
-    var checkingUser: AppUser?,
+    var checkingMember: GroupMember?,
 
     @ManyToOne(fetch = FetchType.EAGER)
-    var owner: AppUser,
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    var owner: GroupMember,
+
+    @ManyToOne
+    @JoinColumn
     var group: AppGroup,
 ) : BaseEntity() {
     @Embedded
@@ -37,17 +44,17 @@ class ShoppingItem(
         priority = dto.priority
     }
 
-    fun check(user: AppUser, timestamp: OffsetDateTime) {
+    fun check(member: GroupMember, timestamp: OffsetDateTime) {
         checkoffTimestamp = timestamp
-        checkingUser = user
+        checkingMember = member
 
-        user.checkedShoppingItems.add(this)
+        member.checkedShoppingItems.add(this)
     }
 
     fun uncheck() {
         checkoffTimestamp = null
-        checkingUser?.checkedShoppingItems?.remove(this)
-        checkingUser = null
+        checkingMember?.checkedShoppingItems?.remove(this)
+        checkingMember = null
     }
 }
 

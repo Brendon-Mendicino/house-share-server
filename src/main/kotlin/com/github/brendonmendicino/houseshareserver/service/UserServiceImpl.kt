@@ -1,7 +1,7 @@
 package com.github.brendonmendicino.houseshareserver.service
 
-import com.github.brendonmendicino.houseshareserver.dto.GroupDto
-import com.github.brendonmendicino.houseshareserver.dto.UserDto
+import com.github.brendonmendicino.houseshareserver.dto.AppGroupDto
+import com.github.brendonmendicino.houseshareserver.dto.AppUserDto
 import com.github.brendonmendicino.houseshareserver.exception.UserException
 import com.github.brendonmendicino.houseshareserver.mapper.toDto
 import com.github.brendonmendicino.houseshareserver.mapper.toEntity
@@ -28,22 +28,22 @@ class UserServiceImpl(
     }
 
     @PreAuthorize("hasRole('admin')")
-    override fun getAll(pageable: Pageable): Page<UserDto> =
+    override fun getAll(pageable: Pageable): Page<AppUserDto> =
         userRepository.findAll(pageable).map { it.toDto() }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isSelf(#id)")
-    override fun getById(id: Long): UserDto =
+    override fun getById(id: Long): AppUserDto =
         userRepository.findByIdOrNull(id)?.toDto() ?: throw UserException.NotFound.from(id)
 
     @Observed(name = "user.create")
     @PreAuthorize("hasRole('admin')")
-    override fun save(dto: UserDto): UserDto =
+    override fun save(dto: AppUserDto): AppUserDto =
         userRepository.save(dto.toEntity()).toDto().also {
             logger.info("Created User@${it.id}")
         }
 
     @PreAuthorize("hasRole('admin')")
-    override fun update(id: Long, dto: UserDto): UserDto {
+    override fun update(id: Long, dto: AppUserDto): AppUserDto {
         val user = dto.toEntity()
         // Create new entity if it does not exist
         user.id = if (userRepository.existsById(id)) id else 0
@@ -60,12 +60,12 @@ class UserServiceImpl(
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isSelf(#userId)")
-    override fun findGroups(userId: Long): List<GroupDto> {
+    override fun findGroups(userId: Long): List<AppGroupDto> {
         val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
         return user.groups.map { it.toDto() }
     }
 
-    override fun loggedUser(): UserDto {
+    override fun loggedUser(): AppUserDto {
         val authentication = SecurityContextHolder.getContext().authentication
             ?: throw InsufficientAuthenticationException("User is not authenticated")
 

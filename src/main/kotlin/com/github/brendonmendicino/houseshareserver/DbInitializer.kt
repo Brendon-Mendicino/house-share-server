@@ -7,6 +7,7 @@ import com.github.brendonmendicino.houseshareserver.service.GroupService
 import com.github.brendonmendicino.houseshareserver.service.UserService
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.data.domain.Pageable
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,9 +27,14 @@ class DbInitializer(
         val authentication = UsernamePasswordAuthenticationToken("command_line_runner", role, authorities)
         SecurityContextHolder.getContext().authentication = authentication
 
-        userService.save(UserDto(0, "brendon", null, null, null, null))
+        val users = userService.getAll(Pageable.ofSize(1))
+        if (users.totalPages == 0) {
+            return
+        }
+
+        userService.save(AppUserDto(0, "brendon", null, null, null, null))
         userService.save(
-            UserDto(
+            AppUserDto(
                 0,
                 "flavy",
                 null,
@@ -37,15 +43,15 @@ class DbInitializer(
                 URI("https://images.unsplash.com/photo-1612170153139-6f881ff067e0?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2hpY2tlbnxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000")
             )
         )
-        userService.save(UserDto(0, "salvo", null, null, null, null))
-        userService.save(UserDto(0, "ciullo", null, null, null, null))
-        userService.save(UserDto(0, "andrea", null, null, null, null))
-        userService.save(UserDto(0, "peppe", null, null, null, null))
+        userService.save(AppUserDto(0, "salvo", null, null, null, null))
+        userService.save(AppUserDto(0, "ciullo", null, null, null, null))
+        userService.save(AppUserDto(0, "andrea", null, null, null, null))
+        userService.save(AppUserDto(0, "peppe", null, null, null, null))
 
-        groupService.save(GroupDto(0, "Belli", "ma io che ne so", listOf(1, 2, 3, 4, 5), null))
-        groupService.save(GroupDto(0, "Brutti", "mah", listOf(1, 2, 3), null))
-        groupService.save(GroupDto(0, "Cicci", "sisi", listOf(1, 3), null))
-        groupService.save(GroupDto(0, "NOOOOO", "tung tung", listOf(2, 3, 4, 5), null))
+        groupService.save(AppGroupDto(0, "Belli", "ma io che ne so", listOf(1, 2, 3, 4, 5), null))
+        groupService.save(AppGroupDto(0, "Brutti", "mah", listOf(1, 2, 3), null))
+        groupService.save(AppGroupDto(0, "Cicci", "sisi", listOf(1, 3), null))
+        groupService.save(AppGroupDto(0, "NOOOOO", "tung tung", listOf(2, 3, 4, 5), null))
 
         groupService.addShoppingItem(
             1, ShoppingItemDto(

@@ -15,7 +15,7 @@ fun ShoppingItem.toDto() = ShoppingItemDto(
     ownerId = owner.id,
     createdAt = audit.createdAt,
     check = Pair(
-        checkingUser?.id,
+        checkingMember?.id,
         checkoffTimestamp
     ).mapNotNull { id, time -> CheckDto(id, time) }
 )

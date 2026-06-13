@@ -28,6 +28,10 @@ class GroupServiceImpl(
         private val logger = LoggerFactory.getLogger(GroupServiceImpl::class.java)
     }
 
+    private fun getGroup(groupId: Long): AppGroup {
+        return groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
+    }
+
     private fun getUser(userId: Long): AppUser {
         return userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
     }
@@ -42,22 +46,38 @@ class GroupServiceImpl(
             ?: throw GroupMemberException.NotFound.from(memberId)
     }
 
+    private fun addUserInternal(group: AppGroup, user: AppUser) {
+        group.addUser(user)
+
+        val member = GroupMember(
+            username = user.username,
+            picture = user.picture,
+            group = group,
+            user = user,
+        )
+
+        group.addMember(member)
+    }
+
     /**
      * Creates a [AppGroup] with its users.
      */
     private fun createGroup(dto: AppGroupDto): AppGroup {
-        val entity = AppGroup(
+        val group = AppGroup(
             name = dto.name,
             description = dto.description,
-            imageUrl = dto.imageUrl?.let { URI(it) },
+            imageUrl = dto.imageUrl,
         )
 
-        dto
+        val users = dto
             .userIds
             .map { getUser(it) }
-            .forEach { entity.addUser(it) }
 
-        return entity
+        for (user in users) {
+            addUserInternal(group, user)
+        }
+
+        return group
     }
 
     internal fun createMember(groupId: Long, memberDto: GroupMemberDto): GroupMember {
@@ -171,12 +191,15 @@ class GroupServiceImpl(
         id: Long,
         dto: AppGroupDto
     ): AppGroupDto {
-        val group = createGroup(dto)
-        // Create new entity if it does not exist
-        group.id = if (groupRepository.existsById(id)) id else 0
+        val group = groupRepository.findByIdOrNull(id) ?: return save(dto)
 
-        return groupRepository.save(group).toDto()
-            .also { logger.info("Updated Group@${it.id}") }
+        group.name = dto.name
+        group.description = dto.description
+        group.imageUrl = dto.imageUrl
+
+        return groupRepository.save(group)
+            .also { logger.info("update: Updated {}", it.ref()) }
+            .toDto()
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#id)")
@@ -185,31 +208,45 @@ class GroupServiceImpl(
         logger.info("Deleted Group@${id}")
     }
 
-    internal fun addUserInternal(groupId: Long, userId: Long): AppGroupDto {
-        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
-        val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
-
-        group.addUser(user)
-
-        return groupRepository.save(group).toDto()
-            .also { logger.info("Added User@$userId to Group@$groupId") }
-    }
-
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun addUser(
         groupId: Long,
         userId: Long
-    ): AppGroupDto = addUserInternal(groupId, userId)
+    ): AppGroupDto {
+        val group = getGroup(groupId)
+        val user = getUser(userId)
+
+        addUserInternal(group, user)
+
+        return groupRepository.save(group)
+            .also { logger.info("addUser: Added {} to {}", user.ref(), it.ref()) }
+            .toDto()
+    }
 
     /**
      * Same as [addUser], but without the authorization checks.
      */
-    override fun addUserNoMember(groupId: Long, userId: Long): AppGroupDto = addUserInternal(groupId, userId)
+    override fun addUserNoMember(groupId: Long, userId: Long): AppGroupDto {
+        val group = getGroup(groupId)
+        val user = getUser(userId)
+
+        addUserInternal(group, user)
+
+        return groupRepository.save(group)
+            .also { logger.info("Added {} from system to {}", user.ref(), it.ref()) }
+            .toDto()
+    }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun removeUser(groupId: Long, userId: Long): AppGroupDto {
-        val group = groupRepository.findByIdOrNull(groupId) ?: throw GroupException.NotFound.from(groupId)
-        val user = userRepository.findByIdOrNull(userId) ?: throw UserException.NotFound.from(userId)
+        val group = getGroup(groupId)
+        val user = getUser(userId)
+
+        val member = groupMemberRepository.findByUserAndGroup(user, group)
+        if (member != null) {
+            member.user = null
+            groupMemberRepository.save(member)
+        }
 
         group.removeUser(user)
 

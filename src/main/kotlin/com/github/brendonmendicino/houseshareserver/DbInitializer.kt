@@ -15,25 +15,33 @@ import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.OffsetDateTime
 
+
 @Component
 @Profile("dev")
 class DbInitializer(
     private val userService: UserService,
     private val groupService: GroupService,
 ) : CommandLineRunner {
+
     override fun run(vararg args: String) {
         val role = "ROLE_admin"
-        val authorities = AuthorityUtils.createAuthorityList(role)
-        val authentication = UsernamePasswordAuthenticationToken("command_line_runner", role, authorities)
-        SecurityContextHolder.getContext().authentication = authentication
+        SecurityContextHolder.getContext().authentication =
+            UsernamePasswordAuthenticationToken(
+                "command_line_runner",
+                role,
+                AuthorityUtils.createAuthorityList(role)
+            )
 
-        val users = userService.getAll(Pageable.ofSize(1))
-        if (users.totalPages == 0) {
+        if (userService.getAll(Pageable.ofSize(1)).totalPages != 0) {
             return
         }
 
-        userService.save(AppUserDto(0, "brendon", null, null, null, null))
-        userService.save(
+        // Users
+        val brendon = userService.save(
+            AppUserDto(0, "brendon", null, null, null, null)
+        )
+
+        val flavy = userService.save(
             AppUserDto(
                 0,
                 "flavy",
@@ -43,91 +51,176 @@ class DbInitializer(
                 URI("https://images.unsplash.com/photo-1612170153139-6f881ff067e0?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2hpY2tlbnxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000")
             )
         )
-        userService.save(AppUserDto(0, "salvo", null, null, null, null))
-        userService.save(AppUserDto(0, "ciullo", null, null, null, null))
-        userService.save(AppUserDto(0, "andrea", null, null, null, null))
-        userService.save(AppUserDto(0, "peppe", null, null, null, null))
 
-        groupService.save(AppGroupDto(0, "Belli", "ma io che ne so", listOf(1, 2, 3, 4, 5), null))
-        groupService.save(AppGroupDto(0, "Brutti", "mah", listOf(1, 2, 3), null))
-        groupService.save(AppGroupDto(0, "Cicci", "sisi", listOf(1, 3), null))
-        groupService.save(AppGroupDto(0, "NOOOOO", "tung tung", listOf(2, 3, 4, 5), null))
+        val salvo = userService.save(
+            AppUserDto(0, "salvo", null, null, null, null)
+        )
 
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 1, 1, "Pizza", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
-            )
+        val ciullo = userService.save(
+            AppUserDto(0, "ciullo", null, null, null, null)
         )
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 1, 1, "pane", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
-            )
+
+        val andrea = userService.save(
+            AppUserDto(0, "andrea", null, null, null, null)
         )
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 2, 1, "patate", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
-            )
+
+        val peppe = userService.save(
+            AppUserDto(0, "peppe", null, null, null, null)
         )
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 3, 1, "cipolla", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
-            )
-        )
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 1, 1, "aglio", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
-            )
-        )
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 1, 1, "spazzola", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
-            )
-        )
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 1, 1, "ciminiera", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
-            )
-        )
-        groupService.addShoppingItem(
-            1, ShoppingItemDto(
-                0, 1, 1, "100k 💶", 1, null, ShoppingItemPriority.Later,
-                OffsetDateTime.now(), null
+
+        // Groups
+        val belli = groupService.save(
+            AppGroupDto(
+                id = 0,
+                name = "Belli",
+                description = "ma io che ne so",
+                userIds = listOf(
+                    brendon.id,
+                    flavy.id,
+                    salvo.id,
+                    ciullo.id,
+                    andrea.id,
+                ),
+                memberIds = emptyList(),
+                imageUrl = null,
             )
         )
 
-        groupService.checkShoppingItem(1, 6, CheckDto(1, OffsetDateTime.now()))
-        groupService.checkShoppingItem(1, 7, CheckDto(1, OffsetDateTime.now()))
-        groupService.checkShoppingItem(1, 8, CheckDto(2, OffsetDateTime.now()))
+        groupService.save(
+            AppGroupDto(
+                0,
+                "Brutti",
+                "mah",
+                listOf(brendon.id, flavy.id, salvo.id),
+                emptyList(),
+                null
+            )
+        )
+
+        groupService.save(
+            AppGroupDto(
+                0,
+                "Cicci",
+                "sisi",
+                listOf(brendon.id, salvo.id),
+                emptyList(),
+                null
+            )
+        )
+
+        groupService.save(
+            AppGroupDto(
+                0,
+                "NOOOOO",
+                "tung tung",
+                listOf(flavy.id, salvo.id, ciullo.id, andrea.id),
+                emptyList(),
+                null
+            )
+        )
+
+        // Members created automatically when the group is created
+        val members = belli.memberIds
+
+        val (b, f, s) = members
+
+        // Shopping items
+        fun item(ownerId: Long, name: String) =
+            ShoppingItemDto(
+                id = 0,
+                ownerId = ownerId,
+                groupId = belli.id,
+                name = name,
+                amount = 1,
+                price = null,
+                priority = ShoppingItemPriority.Later,
+                createdAt = OffsetDateTime.now(),
+                check = null,
+            )
+
+        groupService.addShoppingItem(belli.id, item(b, "Pizza"))
+        groupService.addShoppingItem(belli.id, item(b, "pane"))
+        groupService.addShoppingItem(belli.id, item(f, "patate"))
+        groupService.addShoppingItem(belli.id, item(s, "cipolla"))
+        groupService.addShoppingItem(belli.id, item(b, "aglio"))
+
+        val spazzola = groupService.addShoppingItem(belli.id, item(b, "spazzola"))
+        val ciminiera = groupService.addShoppingItem(belli.id, item(b, "ciminiera"))
+        val money = groupService.addShoppingItem(belli.id, item(b, "100k 💶"))
+
+        groupService.checkShoppingItem(
+            belli.id,
+            spazzola.id,
+            CheckDto(b, OffsetDateTime.now())
+        )
+
+        groupService.checkShoppingItem(
+            belli.id,
+            ciminiera.id,
+            CheckDto(b, OffsetDateTime.now())
+        )
+
+        groupService.checkShoppingItem(
+            belli.id,
+            money.id,
+            CheckDto(f, OffsetDateTime.now())
+        )
+
+        // Expenses
+        fun expense(
+            title: String,
+            ownerId: Long,
+            payerId: Long,
+            vararg parts: Pair<Long, Long>,
+        ) = ExpenseDto(
+            id = 0,
+            category = ExpenseCategory.Home,
+            title = title,
+            description = null,
+            ownerId = ownerId,
+            payerId = payerId,
+            groupId = belli.id,
+            expenseParts = parts.map {
+                ExpensePartDto(
+                    id = 0,
+                    expenseId = 0,
+                    memberId = it.first,
+                    partAmount = it.second
+                )
+            },
+            createdAt = OffsetDateTime.now(),
+        )
 
         groupService.addExpense(
-            1, ExpenseDto(
-                0, ExpenseCategory.Home, "patate", null, 1, 1, 1, OffsetDateTime.now(), listOf(
-                    ExpensePartDto(0, 0, 1, 5),
-                    ExpensePartDto(0, 0, 2, 5),
-                )
+            belli.id,
+            expense(
+                "patate",
+                b,
+                b,
+                b to 5,
+                f to 5
             )
         )
+
         groupService.addExpense(
-            1, ExpenseDto(
-                0, ExpenseCategory.Home, "Cipulle", null, 1, 1, 1, OffsetDateTime.now(), listOf(
-                    ExpensePartDto(0, 0, 2, 10),
-                    ExpensePartDto(0, 0, 3, 10),
-                )
+            belli.id,
+            expense(
+                "Cipulle",
+                b,
+                b,
+                f to 10,
+                s to 10
             )
         )
+
         groupService.addExpense(
-            1, ExpenseDto(
-                0, ExpenseCategory.Home, "polpa", null, 1, 1, 1, OffsetDateTime.now(), listOf(
-                    ExpensePartDto(0, 0, 1, 5),
-                    ExpensePartDto(0, 0, 3, 5),
-                )
+            belli.id,
+            expense(
+                "polpa",
+                b,
+                b,
+                b to 5,
+                s to 5
             )
         )
     }

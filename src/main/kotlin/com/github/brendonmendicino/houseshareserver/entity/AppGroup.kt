@@ -1,12 +1,12 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
 import jakarta.persistence.*
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotBlank
 import java.net.URI
 
 @Entity
 class AppGroup(
-    @NotEmpty
+    @NotBlank
     @Column(nullable = false)
     var name: String,
 
@@ -18,11 +18,15 @@ class AppGroup(
     @Embedded
     lateinit var audit: Auditable
 
-    @ManyToMany(mappedBy = "groups")
-    @JoinTable(name = "app_group_app_user")
+    @ManyToMany
+    @JoinTable(
+        name = "app_group_user",
+        joinColumns = [JoinColumn(name = "group_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")]
+    )
     var users: MutableSet<AppUser> = mutableSetOf()
 
-    @OneToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH])
+    @OneToMany(mappedBy = "group", cascade = [CascadeType.ALL])
     var members: MutableSet<GroupMember> = mutableSetOf()
 
     @OneToMany(mappedBy = "group")

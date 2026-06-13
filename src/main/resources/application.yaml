@@ -2,6 +2,14 @@ spring:
   application:
     name: house-share-server
 
+  flyway:
+    enabled: true
+
+  jpa:
+    hibernate:
+      # We use validate because of flyway
+      ddl-auto: validate
+
 springdoc:
   swagger-ui:
     enabled: false

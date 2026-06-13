@@ -3,12 +3,12 @@ package com.github.brendonmendicino.houseshareserver.dto
 import com.github.brendonmendicino.houseshareserver.validator.NotBlankIfPresent
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import org.hibernate.validator.constraints.URL
+import java.net.URI
 
 data class AppGroupDto(
     val id: Long,
 
-    @field:NotBlank
+    @field:NotBlank(groups = [])
     @field:Size(max = 250)
     val name: String,
 
@@ -19,6 +19,7 @@ data class AppGroupDto(
     @field:Size(min = 1)
     val userIds: List<Long>,
 
-    @field:URL
-    val imageUrl: String?,
+    val memberIds: List<Long>,
+
+    val imageUrl: URI?,
 )

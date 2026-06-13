@@ -1,13 +1,13 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
 import jakarta.persistence.*
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotBlank
 
 @Entity
 class Expense(
     var category: ExpenseCategory?,
 
-    @NotEmpty
+    @NotBlank
     @Column(nullable = false)
     var title: String,
 

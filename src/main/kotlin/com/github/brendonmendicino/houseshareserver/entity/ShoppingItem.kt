@@ -2,15 +2,17 @@ package com.github.brendonmendicino.houseshareserver.entity
 
 import com.github.brendonmendicino.houseshareserver.dto.ShoppingItemDto
 import jakarta.persistence.*
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.PositiveOrZero
 import java.time.OffsetDateTime
 
 @Entity
 class ShoppingItem(
-    @NotEmpty
+    @NotBlank
     @Column(nullable = false)
     var name: String,
+
+    @Column(nullable = false)
     var amount: Int,
     /**
      * Represent the money compact representation.
@@ -26,12 +28,12 @@ class ShoppingItem(
     @ManyToOne
     var checkingMember: GroupMember?,
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     var owner: GroupMember,
 
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     var group: AppGroup,
 ) : BaseEntity() {
     @Embedded

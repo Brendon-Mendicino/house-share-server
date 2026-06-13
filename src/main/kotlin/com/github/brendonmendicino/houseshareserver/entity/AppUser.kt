@@ -1,8 +1,8 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
+import com.github.brendonmendicino.houseshareserver.validator.NotBlankIfPresent
 import jakarta.persistence.*
 import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.NotEmpty
 import org.hibernate.annotations.CreationTimestamp
 import java.net.URI
 import java.time.OffsetDateTime
@@ -14,18 +14,17 @@ import java.time.OffsetDateTime
     ]
 )
 class AppUser(
-    @NotEmpty
+    @NotBlankIfPresent
     @Column(nullable = false)
     var username: String,
 
     @Email
-    @NotEmpty
     var email: String?,
 
-    @NotEmpty
+    @NotBlankIfPresent
     var firstName: String?,
 
-    @NotEmpty
+    @NotBlankIfPresent
     var lastName: String?,
     /**
      * OAuth2 User ID. Specify if this user was created using
@@ -40,8 +39,8 @@ class AppUser(
     @CreationTimestamp
     lateinit var createdAt: OffsetDateTime
 
-    @ManyToMany(cascade = [CascadeType.MERGE])
-    var groups: MutableSet<AppGroup> = mutableSetOf()
+    @ManyToMany(mappedBy = "users")
+    var groups: MutableList<AppGroup> = mutableListOf()
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.MERGE])
     var members: MutableList<GroupMember> = mutableListOf()

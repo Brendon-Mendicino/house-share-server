@@ -1,10 +1,12 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
+import com.github.brendonmendicino.houseshareserver.validator.NotBlankIfPresent
 import jakarta.persistence.*
 import java.net.URI
 
 @Entity
 class GroupMember(
+    @NotBlankIfPresent
     @Column(nullable = false)
     var username: String,
 
@@ -12,7 +14,7 @@ class GroupMember(
     var picture: URI?,
 
     @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "group_id", nullable = false)
     var group: AppGroup,
 
     @ManyToOne(fetch = FetchType.EAGER)

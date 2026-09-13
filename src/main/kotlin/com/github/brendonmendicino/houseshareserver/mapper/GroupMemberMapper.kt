@@ -5,7 +5,8 @@ import com.github.brendonmendicino.houseshareserver.entity.GroupMember
 
 fun GroupMember.toDto(): GroupMemberDto = GroupMemberDto(
     id = id,
-    username = username,
+    firstName = firstName,
+    lastName = lastName,
     picture = picture?.toString(),
     groupId = group.id,
     userId = user?.id,

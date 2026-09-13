@@ -37,6 +37,12 @@ class GroupController(
     @GetMapping("/{groupId}/users/{userId}")
     fun getUserById(@PathVariable groupId: Long, @PathVariable userId: Long) = groupService.getUserById(groupId, userId)
 
+    @GetMapping("/{groupId}/members")
+    fun getMembers(@PathVariable groupId: Long) = groupService.getMembers(groupId)
+
+    @GetMapping("/{groupId}/members/{memberId}")
+    fun getMember(@PathVariable groupId: Long, @PathVariable memberId: Long) = groupService.getMember(groupId, memberId)
+
     @PostMapping("/{groupId}/members")
     fun addMember(@PathVariable groupId: Long, @Valid member: GroupMemberDto) = groupService.addMember(groupId, member)
 

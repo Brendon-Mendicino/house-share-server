@@ -8,6 +8,9 @@ import kotlin.annotation.AnnotationTarget.FIELD
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 import kotlin.reflect.KClass
 
+/**
+ * Like [jakarta.validation.constraints.NotBlank], but won't fail on a `null` value.
+ */
 @MustBeDocumented
 @Constraint(validatedBy = [NotBlankIfPresentValidator::class])
 @Target(FIELD, VALUE_PARAMETER)

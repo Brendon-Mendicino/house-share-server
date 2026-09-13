@@ -19,7 +19,9 @@ data class AppGroupDto(
     @field:Size(min = 1)
     val userIds: List<Long>,
 
-    val memberIds: List<Long>,
+    val users: List<AppUserDto> = listOf(),
+
+    val members: List<GroupMemberDto> = listOf(),
 
     val imageUrl: URI?,
 )

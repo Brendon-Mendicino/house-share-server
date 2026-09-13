@@ -8,7 +8,10 @@ import java.net.URI
 class GroupMember(
     @NotBlankIfPresent
     @Column(nullable = false)
-    var username: String,
+    var firstName: String,
+
+    @NotBlankIfPresent
+    var lastName: String?,
 
     @Column(columnDefinition = "TEXT")
     var picture: URI?,

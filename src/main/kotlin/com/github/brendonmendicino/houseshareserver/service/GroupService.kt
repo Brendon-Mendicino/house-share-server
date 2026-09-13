@@ -15,6 +15,10 @@ interface GroupService : CrudService<AppGroupDto> {
 
     fun getUserById(groupId: Long, userId: Long): AppUserDto
 
+    fun getMembers(groupId: Long): List<GroupMemberDto>
+
+    fun getMember(groupId: Long, memberId: Long): GroupMemberDto
+
     fun addMember(groupId: Long, member: GroupMemberDto): GroupMemberDto
 
     fun updateMember(groupId: Long, memberId: Long, member: GroupMemberDto): GroupMemberDto

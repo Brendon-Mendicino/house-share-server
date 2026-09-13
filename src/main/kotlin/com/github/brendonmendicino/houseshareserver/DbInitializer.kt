@@ -81,7 +81,7 @@ class DbInitializer(
                     ciullo.id,
                     andrea.id,
                 ),
-                memberIds = emptyList(),
+                members = emptyList(),
                 imageUrl = null,
             )
         )
@@ -93,7 +93,8 @@ class DbInitializer(
                 "mah",
                 listOf(brendon.id, flavy.id, salvo.id),
                 emptyList(),
-                null
+                emptyList(),
+                null,
             )
         )
 
@@ -103,6 +104,7 @@ class DbInitializer(
                 "Cicci",
                 "sisi",
                 listOf(brendon.id, salvo.id),
+                emptyList(),
                 emptyList(),
                 null
             )
@@ -115,12 +117,13 @@ class DbInitializer(
                 "tung tung",
                 listOf(flavy.id, salvo.id, ciullo.id, andrea.id),
                 emptyList(),
+                emptyList(),
                 null
             )
         )
 
         // Members created automatically when the group is created
-        val members = belli.memberIds
+        val members = belli.members.map { it.id }
 
         val (b, f, s) = members
 

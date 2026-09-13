@@ -49,12 +49,7 @@ class GroupServiceImpl(
     private fun addUserInternal(group: AppGroup, user: AppUser) {
         group.addUser(user)
 
-        val member = GroupMember(
-            username = user.username,
-            picture = user.picture,
-            group = group,
-            user = user,
-        )
+        val member = user.toMember(group)
 
         group.addMember(member)
     }
@@ -88,7 +83,13 @@ class GroupServiceImpl(
             null
         }
 
-        val member = GroupMember(memberDto.username, memberDto.picture?.let { URI(it) }, group, user)
+        val member = GroupMember(
+            firstName = memberDto.firstName,
+            lastName = memberDto.lastName,
+            picture = memberDto.picture?.let { URI(it) },
+            group = group,
+            user = user
+        )
         user?.members?.add(member)
 
         group.addMember(member)
@@ -263,6 +264,19 @@ class GroupServiceImpl(
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun getUserById(groupId: Long, userId: Long): AppUserDto {
         return groupRepository.findUserById(groupId, userId)?.toDto() ?: throw UserException.NotFound.from(userId)
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun getMembers(groupId: Long): List<GroupMemberDto> {
+        val group = getGroup(groupId)
+        return group.members.map { it.toDto() }
+    }
+
+    @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
+    override fun getMember(groupId: Long, memberId: Long): GroupMemberDto {
+        return groupMemberRepository.findByIdAndGroupId(memberId, groupId)
+            ?.toDto()
+            ?: throw GroupMemberException.NotFound.from(memberId)
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")

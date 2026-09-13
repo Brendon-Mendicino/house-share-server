@@ -44,4 +44,12 @@ class AppUser(
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.MERGE])
     var members: MutableList<GroupMember> = mutableListOf()
+
+    fun toMember(group: AppGroup) = GroupMember(
+        firstName = firstName ?: username,
+        lastName = lastName,
+        picture = picture,
+        group = group,
+        user = this,
+    )
 }

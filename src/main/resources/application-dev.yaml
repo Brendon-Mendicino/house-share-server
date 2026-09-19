@@ -17,7 +17,8 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8080/realms/house-share
+            #            issuer-uri: http://localhost:8080/realms/house-share
+            issuer-uri: http://192.168.1.150:8080/realms/house-share
         registration:
           house-share-server:
             provider: keycloak
@@ -27,7 +28,8 @@ spring:
               - openid
               - offline_access
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:${server.port}/login/oauth2/code/house-share-server
+            #            redirect-uri: http://localhost:${server.port}/login/oauth2/code/house-share-server
+            redirect-uri: http://192.168.1.150:${server.port}/login/oauth2/code/house-share-server
 
           house-share-app:
             provider: keycloak
@@ -37,7 +39,7 @@ spring:
               - openid
               - offline_access
             authorization-grant-type: authorization_code
-            redirect-uri: app://lol.terabrendon.houseshare2/login
+            redirect-uri: app://lol.terabrendon.houseshare2/login/oauth2
 
 logging:
   level:

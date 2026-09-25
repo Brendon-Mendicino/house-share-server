@@ -1,5 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.entity
 
+import com.github.brendonmendicino.houseshareserver.dto.GroupMemberDto
 import com.github.brendonmendicino.houseshareserver.validator.NotBlankIfPresent
 import jakarta.persistence.*
 import java.net.URI
@@ -38,6 +39,13 @@ class GroupMember(
     @OneToMany(mappedBy = "payer", cascade = [CascadeType.MERGE])
     var payedExpenses: MutableSet<Expense> = mutableSetOf()
 
+
+    fun update(dto: GroupMemberDto, user: AppUser? = null) {
+        firstName = dto.firstName
+        lastName = dto.lastName
+        picture = dto.picture?.let { URI(it) }
+        this.user = user
+    }
 
     fun addShoppingItem(item: ShoppingItem) {
         shoppingItems.add(item)

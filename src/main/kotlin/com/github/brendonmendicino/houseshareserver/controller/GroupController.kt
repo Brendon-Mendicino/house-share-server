@@ -44,10 +44,15 @@ class GroupController(
     fun getMember(@PathVariable groupId: Long, @PathVariable memberId: Long) = groupService.getMember(groupId, memberId)
 
     @PostMapping("/{groupId}/members")
-    fun addMember(@PathVariable groupId: Long, @Valid member: GroupMemberDto) = groupService.addMember(groupId, member)
+    fun addMember(@PathVariable groupId: Long, @Valid @RequestBody member: GroupMemberDto) =
+        groupService.addMember(groupId, member)
 
     @PutMapping("/{groupId}/members/{memberId}")
-    fun updateMember(@PathVariable groupId: Long, @PathVariable memberId: Long, @Valid member: GroupMemberDto) =
+    fun updateMember(
+        @PathVariable groupId: Long,
+        @PathVariable memberId: Long,
+        @Valid @RequestBody member: GroupMemberDto
+    ) =
         groupService.updateMember(groupId, memberId, member)
 
     @PostMapping("/{groupId}/shopping-items")

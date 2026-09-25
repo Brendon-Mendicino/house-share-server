@@ -281,18 +281,24 @@ class GroupServiceImpl(
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun addMember(groupId: Long, member: GroupMemberDto): GroupMemberDto {
-        return groupMemberRepository.save(createMember(groupId, member))
+        val entity = createMember(groupId, member)
+        return groupMemberRepository.save(entity)
             .also { logger.info("Added {} to {}", it.ref(), it.group.ref()) }
             .toDto()
     }
 
     @PreAuthorize("hasRole('admin') || @authorizationService.isMemberOf(#groupId)")
     override fun updateMember(groupId: Long, memberId: Long, member: GroupMemberDto): GroupMemberDto {
-        val member = createMember(groupId, member)
+        val entity = getMemberInGroup(groupId, memberId)
+        val user = if (member.userId != null) {
+            getUserInGroup(groupId, member.userId)
+        } else {
+            null
+        }
 
-        member.id = memberId
+        entity.update(dto = member, user = user)
 
-        return groupMemberRepository.save(member)
+        return groupMemberRepository.save(entity)
             .also { logger.info("Updated {} of {}", it.ref(), it.group.ref()) }
             .toDto()
     }

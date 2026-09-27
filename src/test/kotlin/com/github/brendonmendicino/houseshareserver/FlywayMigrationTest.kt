@@ -1,5 +1,6 @@
 package com.github.brendonmendicino.houseshareserver
 
+import com.github.brendonmendicino.houseshareserver.configuration.Profiles
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.test.annotation.DirtiesContext
@@ -11,7 +12,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @SpringBootTest
 @Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-@ActiveProfiles("no-security", "test")
+@ActiveProfiles(Profiles.NO_SECURITY, Profiles.TEST)
 abstract class FlywayMigrationTest {
     companion object {
         @JvmStatic

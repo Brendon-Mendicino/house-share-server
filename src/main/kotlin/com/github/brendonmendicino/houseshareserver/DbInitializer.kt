@@ -1,5 +1,6 @@
 package com.github.brendonmendicino.houseshareserver
 
+import com.github.brendonmendicino.houseshareserver.configuration.Profiles
 import com.github.brendonmendicino.houseshareserver.dto.*
 import com.github.brendonmendicino.houseshareserver.entity.ExpenseCategory
 import com.github.brendonmendicino.houseshareserver.entity.ShoppingItemPriority
@@ -17,7 +18,7 @@ import java.time.OffsetDateTime
 
 
 @Component
-@Profile("dev")
+@Profile(Profiles.DEV)
 class DbInitializer(
     private val userService: UserService,
     private val groupService: GroupService,

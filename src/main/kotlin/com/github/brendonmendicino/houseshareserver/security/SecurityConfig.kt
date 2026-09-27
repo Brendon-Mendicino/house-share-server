@@ -1,5 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.security
 
+import com.github.brendonmendicino.houseshareserver.configuration.Profiles
 import com.github.brendonmendicino.houseshareserver.security.SecurityConfig.Companion.ADMIN_ROLE
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest
 import org.springframework.context.annotation.Bean
@@ -36,7 +37,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@Profile("!no-security")
+@Profile(Profiles.SECURITY)
 class SecurityConfig(
     private val crr: ClientRegistrationRepository,
     private val oidcUserService: OAuth2UserService<OidcUserRequest, OidcUser>,

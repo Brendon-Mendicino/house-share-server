@@ -47,6 +47,11 @@ logging:
     org.springframework.web: debug
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
   observations:
     annotations:
       enabled: true

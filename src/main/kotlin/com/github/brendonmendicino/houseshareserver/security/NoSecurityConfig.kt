@@ -1,5 +1,6 @@
 package com.github.brendonmendicino.houseshareserver.security
 
+import com.github.brendonmendicino.houseshareserver.configuration.Profiles
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -12,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@Profile("no-security")
+@Profile(Profiles.NO_SECURITY)
 class NoSecurityConfig {
     @Bean
     fun noSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {

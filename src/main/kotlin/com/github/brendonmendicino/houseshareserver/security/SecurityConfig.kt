@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.HttpSecurityDsl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
@@ -21,6 +22,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
 /**
@@ -47,11 +49,21 @@ class SecurityConfig(
     }
 
     /**
-     * Handle RP-initiated logout
+     * Handle RP-initiated logout, each client registration gets its own post-logout redirect
+     * (it must be allowed by that client in Keycloak).
      */
-    private fun oidcLogoutSuccessHandler() = OidcClientInitiatedLogoutSuccessHandler(crr)
-        // TODO: change
-        .also { it.setPostLogoutRedirectUri("{baseUrl}") }
+    private fun oidcLogoutSuccessHandler(): LogoutSuccessHandler {
+        val web = OidcClientInitiatedLogoutSuccessHandler(crr)
+            .also { it.setPostLogoutRedirectUri("{baseUrl}") }
+        val app = OidcClientInitiatedLogoutSuccessHandler(crr)
+            .also { it.setPostLogoutRedirectUri("app://lol.terabrendon.houseshare2/logout") }
+
+        return LogoutSuccessHandler { request, response, authentication ->
+            val registrationId = (authentication as? OAuth2AuthenticationToken)?.authorizedClientRegistrationId
+            val delegate = if (registrationId == "house-share-app") app else web
+            delegate.onLogoutSuccess(request, response, authentication)
+        }
+    }
 
     /**
      * CSRF protection shared by every chain: the token is exposed in a JS-readable cookie (SPA pattern).

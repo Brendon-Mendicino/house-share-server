@@ -1,6 +1,7 @@
 package com.github.brendonmendicino.houseshareserver.service
 
 import com.github.brendonmendicino.houseshareserver.util.toB64Url
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import org.springframework.web.util.UriComponentsBuilder
@@ -15,7 +16,10 @@ import kotlin.time.DurationUnit
 @Service
 class SignedUrlService {
     companion object {
+        private val logger = LoggerFactory.getLogger(SignedUrlService::class.java)
+
         private const val HMAC_ALGORITHM = "HmacSHA256"
+        private val LIFETIME = 1.days
         private val SECRET: ByteArray = generateRandom()
 
         private fun generateRandom(): ByteArray {
@@ -24,8 +28,6 @@ class SignedUrlService {
             SecureRandom().nextBytes(secretKeyBytes)
             return secretKeyBytes
         }
-
-        private val LIFETIME = 1.days
     }
 
     fun computeSignature(uri: URI): ByteArray {
@@ -66,8 +68,16 @@ class SignedUrlService {
     fun validateUri(uri: URI): Boolean {
         val uriComponents = UriComponentsBuilder.fromUri(uri).build()
 
-        val expires = uriComponents.queryParams.getFirst("expires")?.toLongOrNull() ?: return false
-        val signature = uriComponents.queryParams.getFirst("signature") ?: return false
+        val expires = uriComponents.queryParams.getFirst("expires")?.toLongOrNull()
+        if (expires == null) {
+            logger.debug("Invalid signed URI {}: missing or invalid 'expires'", uri.path)
+            return false
+        }
+        val signature = uriComponents.queryParams.getFirst("signature")
+        if (signature == null) {
+            logger.debug("Invalid signed URI {}: missing 'signature'", uri.path)
+            return false
+        }
 
         // Validate signature
         val uriWoSignature = UriComponentsBuilder.newInstance()
@@ -80,19 +90,26 @@ class SignedUrlService {
         val computedSignature = computeSignature(uriWoSignature).toB64Url()
 
         if (computedSignature != signature) {
+            logger.debug("Invalid signed URI {}: signature mismatch", uri.path)
             return false
         }
 
         // Validate expiration
         val now = Instant.now().epochSecond
 
-        return now <= expires
+        if (now > expires) {
+            logger.debug("Invalid signed URI {}: expired at {}, now {}", uri.path, expires, now)
+            return false
+        }
+
+        return true
     }
 
     fun validCurrentUri(): Boolean {
         val uri = try {
             ServletUriComponentsBuilder.fromCurrentRequest().build().toUri()
         } catch (_: IllegalStateException) {
+            logger.debug("validCurrentUri called outside of a request")
             return false
         }
 

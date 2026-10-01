@@ -45,6 +45,10 @@ logging:
   level:
     root: info
     org.springframework.web: debug
+    # Explain why @PreAuthorize checks fail
+    org.springframework.security.authorization: debug
+    com.github.brendonmendicino.houseshareserver.service.AuthorizationService: debug
+    com.github.brendonmendicino.houseshareserver.service.SignedUrlService: debug
 
 management:
   endpoints:
@@ -85,4 +89,4 @@ springdoc:
 server:
   port: 9090
 
-debug: true
+#debug: true

@@ -8,6 +8,10 @@ import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authorization.AuthorizationDeniedException
+import org.springframework.security.authorization.ExpressionAuthorizationDecision
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -23,6 +27,17 @@ class GlobalExceptionHandler {
     fun handleException(e: Exception): ProblemDetail {
         logger.error("Unexpected error occurred while processing the request", e)
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, e.message)
+    }
+
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handleAccessDenied(e: AccessDeniedException): ProblemDetail {
+        val expression = ((e as? AuthorizationDeniedException)?.authorizationResult
+                as? ExpressionAuthorizationDecision)?.expression?.expressionString
+        val user = SecurityContextHolder.getContext().authentication?.name
+        logger.warn("Access denied for user {}: expression {}", user, expression)
+
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Access denied")
     }
 
 

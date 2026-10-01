@@ -533,7 +533,9 @@
     "enabled" : true,
     "alwaysDisplayInConsole" : true,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "app://lol.terabrendon.houseshare2" ],
+    "redirectUris": [
+      "app://lol.terabrendon.houseshare2/*"
+    ],
     "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -1235,14 +1237,14 @@
       "subComponents" : { },
       "config" : {
         "allowed-protocol-mapper-types": [
+          "saml-role-list-mapper",
           "saml-user-attribute-mapper",
           "oidc-usermodel-property-mapper",
+          "oidc-sha256-pairwise-sub-mapper",
+          "oidc-address-mapper",
           "oidc-full-name-mapper",
           "oidc-usermodel-attribute-mapper",
-          "saml-user-property-mapper",
-          "oidc-sha256-pairwise-sub-mapper",
-          "saml-role-list-mapper",
-          "oidc-address-mapper"
+          "saml-user-property-mapper"
         ]
       }
     }, {
@@ -1253,14 +1255,14 @@
       "subComponents" : { },
       "config" : {
         "allowed-protocol-mapper-types": [
+          "oidc-sha256-pairwise-sub-mapper",
+          "oidc-address-mapper",
+          "saml-user-property-mapper",
           "oidc-full-name-mapper",
           "oidc-usermodel-attribute-mapper",
-          "oidc-address-mapper",
-          "oidc-usermodel-property-mapper",
-          "saml-role-list-mapper",
-          "saml-user-property-mapper",
           "saml-user-attribute-mapper",
-          "oidc-sha256-pairwise-sub-mapper"
+          "oidc-usermodel-property-mapper",
+          "saml-role-list-mapper"
         ]
       }
     }, {

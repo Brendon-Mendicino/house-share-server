@@ -46,7 +46,12 @@ class GroupServiceImpl(
             ?: throw GroupMemberException.NotFound.from(memberId)
     }
 
+    /**
+     * Links [user] to [group] with a new member, no-op if the user is already in the group.
+     */
     private fun addUserInternal(group: AppGroup, user: AppUser) {
+        if (user in group.users) return
+
         group.addUser(user)
 
         val member = user.toMember(group)

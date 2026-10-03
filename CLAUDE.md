@@ -12,7 +12,7 @@ observability.
 
 All via the Gradle wrapper (`./gradlew`):
 
-- Build: `./gradlew build` — Run app: `./gradlew bootRun --args='--spring.profiles.active=dev'`
+- Build: `./gradlew build` — Run app: `./gradlew bootRun --args='--spring.profiles.active=dev,local'`
 - Run all tests: `./gradlew test`
 - Run one test class:
   `./gradlew test --tests 'com.github.brendonmendicino.houseshareserver.service.SignedUrlServiceTest'`
@@ -27,7 +27,7 @@ Tests use **Testcontainers** (Postgres + Grafana LGTM), so Docker must be runnin
 
 `compose.yaml` provides Keycloak (:8080, admin/password, imports the realm from `docker/keycloak/realm`), Postgres (:
 5432, `myuser`/`secret`/`mydatabase`) and Grafana LGTM (:3000, OTLP on :4317/:4318). `spring-boot-docker-compose` is a
-`developmentOnly` dep, so `bootRun` starts these automatically. The app itself listens on **:9090** in `dev`.
+`developmentOnly` dep, so `bootRun` starts these automatically. The app itself listens on **:9090** in `local`.
 `scripts/export-keycloak-config.sh` exports the running Keycloak realm back into `docker/keycloak/realm`;
 `doc/keycloak-setup.md` describes the realm-role → ID-token mapper needed for role-based auth.
 
@@ -36,8 +36,10 @@ of compose.
 
 ## Profiles
 
-- `dev` — local compose services, 100% trace sampling, Swagger UI at `/swagger-ui.html`, `DbInitializer` seeds
-  users/groups/items/expenses on an empty DB (it runs with a fake `ROLE_admin` security context).
+- `dev` — `DbInitializer` seeds users/groups/items/expenses on an empty DB (it runs with a fake `ROLE_admin` security
+  context) and `LoggingInterceptor` logs every request. Usually combined with `local`.
+- `local` — `application-local.yaml`: local compose services, port 9090, 100% trace sampling, Swagger UI at
+  `/swagger-ui.html`, DEBUG logging for web/authorization/SQL.
 - `prod` — everything from env vars (`DB_URL`, `ISSUER_URI`, `SERVER_CLIENT_ID`, …, `*_EXPORT_URL`, `SERVER_PORT`).
 - `test` — activated by `src/test/resources/application.yaml`; enables `flyway.clean-disabled=false`.
 - `no-security` — swaps `SecurityConfig` for `NoSecurityConfig` (permit-all, CSRF/CORS off) and disables
@@ -84,8 +86,9 @@ translated to RFC 7807 `ProblemDetail` responses in `advice/GlobalExceptionHandl
 new exception type.
 
 **Observability.** `@Observed` on service methods, `TraceIdFilter`/`UserMdcFilter` put trace id and `user.sub` into MDC,
-`logback-spring.xml` writes coloured console output plus JSONL to `logs/` and ships logs via the OTel appender (
-`InstallOpenTelemetryAppender`). `OpenTelemetryConfiguration` switches Micrometer JVM/HTTP metrics to OTel semantic
+`logback-spring.xml` writes coloured console output (with trace id and `user.sub`) plus JSONL to `logs/` and ships logs
+via the OTel appender (`InstallOpenTelemetryAppender`); under `prod` it uses a plain console and OTel only, no file.
+`OpenTelemetryConfiguration` switches Micrometer JVM/HTTP metrics to OTel semantic
 conventions.
 
 **Web.** Paged endpoints accept Spring `Pageable`; `WebConfig` sets `PageSerializationMode.VIA_DTO`. Custom

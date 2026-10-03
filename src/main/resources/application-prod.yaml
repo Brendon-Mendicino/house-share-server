@@ -39,6 +39,10 @@ logging:
   level:
     root: warn
     com.github.brendonmendicino.houseshareserver: info
+    # Applied migrations and the startup port
+    org.flywaydb: info
+    org.springframework.boot.tomcat: info
+    org.springframework.boot.web: info
 
 management:
   observations:

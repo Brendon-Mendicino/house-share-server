@@ -20,7 +20,10 @@ https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/htmlsingle/log
     <property name="LOG_FILE" value="logs/${springAppName}"/>
     <!--  You can override this to have a custom pattern  -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="%clr(%date){faint} | %clr(${LOG_LEVEL_PATTERN:-%5level}) | %clr(%40logger{39}:%-5line){faint} | %clr(%msg) %n%clr(${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}){red}"/>
+              value="%clr(%date){faint} | %clr(${LOG_LEVEL_PATTERN:-%5level}) | %clr(${LOG_CORRELATION_PATTERN:-}%X{user.sub:-}){faint} | %clr(%40logger{39}:%-5line){faint} | %clr(%msg) %n%clr(${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}){red}"/>
+    <!--  Same as CONSOLE_LOG_PATTERN but without colors and `%line`, which needs (expensive) caller data  -->
+    <property name="PROD_CONSOLE_LOG_PATTERN"
+              value="%date | ${LOG_LEVEL_PATTERN:-%5level} | ${LOG_CORRELATION_PATTERN:-}%X{user.sub:-} | %40logger{39} | %msg%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <!--  Appender to log to console  -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -61,9 +64,27 @@ https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/htmlsingle/log
         <captureMdcAttributes>*</captureMdcAttributes>
     </appender>
 
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="JSON_FILE"/>
-        <appender-ref ref="OTEL"/>
-    </root>
+    <!--  Production console: plain text for `docker logs`, structured logs are shipped through OTEL  -->
+    <appender name="PROD_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PROD_CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="PROD_CONSOLE"/>
+            <appender-ref ref="OTEL"/>
+        </root>
+    </springProfile>
+
+    <!--  The JSON file is only useful locally: in a container it is lost on redeploy and duplicates OTEL  -->
+    <springProfile name="!prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="JSON_FILE"/>
+            <appender-ref ref="OTEL"/>
+        </root>
+    </springProfile>
 </configuration>

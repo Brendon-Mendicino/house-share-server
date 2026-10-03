@@ -49,6 +49,9 @@ logging:
     org.springframework.security.authorization: debug
     com.github.brendonmendicino.houseshareserver.service.AuthorizationService: debug
     com.github.brendonmendicino.houseshareserver.service.SignedUrlService: debug
+    # SQL statements (formatted by `hibernate.format_sql`) and their bound parameters
+#    org.hibernate.SQL: debug
+#    org.hibernate.orm.jdbc.bind: trace
 
 management:
   endpoints:
